@@ -1,5 +1,6 @@
 package com.maryf.spotkeeper;
 
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,8 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.LinearLayoutManager;
+
 
 /**
  * Created by maryf on 4/5/2017.
@@ -17,7 +18,8 @@ import android.support.v7.widget.LinearLayoutManager;
 public class SpotsListFragment extends Fragment implements SpotsListAdapter.SpotListAdapterListener {
 
     public interface SpotsListFragmentListener {
-        public void onSpotClick(Spot spot);
+        void onSpotClick(Spot spot);
+        void onAddNewSpotClick();
     }
 
     //final - нельзя переопределить
@@ -49,9 +51,16 @@ public class SpotsListFragment extends Fragment implements SpotsListAdapter.Spot
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-
         final SpotsListAdapter spotsListAdapter = new SpotsListAdapter(spots, this);
         recyclerView.setAdapter(spotsListAdapter);
+
+        FloatingActionButton addNewSpotBtn = (FloatingActionButton) rootView.findViewById(R.id.AddNewSpotBtn);
+        addNewSpotBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onAddNewSpotClick();
+            }
+        });
 
         return rootView;
     }

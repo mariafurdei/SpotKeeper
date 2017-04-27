@@ -38,8 +38,6 @@ public class SpotDetailFragment extends Fragment {
         return detailFragment;
     }
 
-
-
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstance) {
 

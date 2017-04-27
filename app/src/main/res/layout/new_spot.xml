@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:text="Spot name: "
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/new_spot_name_label" />
+
+    <EditText
+        android:id="@+id/new_spot_name_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/new_spot_name_label"
+        android:layout_alignBaseline="@id/new_spot_name_label"
+        android:text="1"
+        android:inputType="text" />
+
+    <TextView
+        android:text="Spot address: "
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/new_spot_name_label"
+        android:id="@+id/new_spot_address_label" />
+
+    <EditText
+        android:id="@+id/new_spot_address_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/new_spot_address_label"
+        android:layout_below="@id/new_spot_name_edit_text"
+        android:layout_alignBaseline="@id/new_spot_address_label"
+        android:text="2"
+        android:inputType="text" />
+
+    <Button
+        android:text="Cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/CancelAddNewSpotBtn"
+        android:background="@color/colorAccent" />
+
+    <Button
+        android:text="SAVE"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/SaveNewSpotBtn"
+        android:background="@android:color/holo_green_light" />
+
+</RelativeLayout>
