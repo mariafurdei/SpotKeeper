@@ -5,6 +5,11 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.maryf.spotkeeper.fragments.NewSpotFragment;
+import com.maryf.spotkeeper.fragments.SpotDetailFragment;
+import com.maryf.spotkeeper.fragments.SpotsListFragment;
+import com.maryf.spotkeeper.model.Spot;
+
 public class SpotsListActivity extends AppCompatActivity implements
         SpotsListFragment.SpotsListFragmentListener,
         SpotDetailFragment.SpotDetailFragmentListener,

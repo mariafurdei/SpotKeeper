@@ -1,4 +1,4 @@
-package com.maryf.spotkeeper;
+package com.maryf.spotkeeper.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,13 +8,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.maryf.spotkeeper.R;
+import com.maryf.spotkeeper.model.Spot;
+
 /**
  * Created by maryf on 4/19/2017.
  */
 
 public class NewSpotFragment extends Fragment {
 
-    interface NewSpotFragmentListener {
+    public interface NewSpotFragmentListener {
         void onCancelAddNewSpotClick();
         void onSaveNewSpotClick(Spot spot);
     }

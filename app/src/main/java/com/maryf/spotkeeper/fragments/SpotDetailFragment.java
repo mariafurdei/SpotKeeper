@@ -1,23 +1,22 @@
-package com.maryf.spotkeeper;
+package com.maryf.spotkeeper.fragments;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import static com.maryf.spotkeeper.SpotsListFragment.spots;
+import com.maryf.spotkeeper.R;
+import com.maryf.spotkeeper.model.Spot;
 
 /**
  * Created by maryf on 4/10/2017.
  */
 
 public class SpotDetailFragment extends Fragment {
-    interface SpotDetailFragmentListener {
+    public interface SpotDetailFragmentListener {
         void onCloseDetailsClick();
     }
 

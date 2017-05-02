@@ -1,4 +1,4 @@
-package com.maryf.spotkeeper;
+package com.maryf.spotkeeper.model;
 
 import java.io.Serializable;
 
@@ -10,7 +10,7 @@ public class Spot implements Serializable {
     private String mName;
     private String mAddress;
 
-    Spot(String name, String address) {
+    public Spot(String name, String address) {
         mName = name;
         mAddress = address;
     }

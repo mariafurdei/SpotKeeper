@@ -1,4 +1,4 @@
-package com.maryf.spotkeeper;
+package com.maryf.spotkeeper.fragments;
 
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -9,6 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.LinearLayoutManager;
+
+import com.maryf.spotkeeper.R;
+import com.maryf.spotkeeper.model.Spot;
+import com.maryf.spotkeeper.SpotsListAdapter;
 
 
 /**
