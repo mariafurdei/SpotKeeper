@@ -1,9 +1,13 @@
 package com.maryf.spotkeeper.fragments;
 
+import android.database.Cursor;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +15,7 @@ import android.view.ViewGroup;
 import android.support.v7.widget.LinearLayoutManager;
 
 import com.maryf.spotkeeper.R;
+import com.maryf.spotkeeper.contentproviders.SpotsContentProvider;
 import com.maryf.spotkeeper.model.Spot;
 import com.maryf.spotkeeper.SpotsListAdapter;
 
@@ -19,23 +24,31 @@ import com.maryf.spotkeeper.SpotsListAdapter;
  * Created by maryf on 4/5/2017.
  */
 
-public class SpotsListFragment extends Fragment implements SpotsListAdapter.SpotListAdapterListener {
+public class SpotsListFragment extends Fragment implements SpotsListAdapter.SpotListAdapterListener, LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String[] CONTACTS_SUMMARY_PROJECTION = {SpotsContentProvider.COLUMN_SPOT_NAME, SpotsContentProvider.COLUMN_SPOT_ADDRESS};
+
+    private SpotsListAdapter spotsListAdapter;
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(getActivity(), SpotsContentProvider.CONTENT_URI,
+                CONTACTS_SUMMARY_PROJECTION, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        spotsListAdapter.setCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        spotsListAdapter.setCursor(null);
+    }
 
     public interface SpotsListFragmentListener {
         void onSpotClick(Spot spot);
         void onAddNewSpotClick();
     }
-
-    //final - нельзя переопределить
-    static final Spot[] spots = new Spot[] {
-            new Spot("Sunnyvale", "5 Street5" +
-                    ""),
-            new Spot("MV", "1 Street1"),
-            new Spot("SF", "2 Street2"),
-            new Spot("SJ", "3 Street3"),
-            new Spot("PA", "4 Street4")
-
-    };
 
     private SpotsListFragmentListener listener;
 
@@ -55,7 +68,7 @@ public class SpotsListFragment extends Fragment implements SpotsListAdapter.Spot
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-        final SpotsListAdapter spotsListAdapter = new SpotsListAdapter(spots, this);
+        spotsListAdapter = new SpotsListAdapter(this);
         recyclerView.setAdapter(spotsListAdapter);
 
         FloatingActionButton addNewSpotBtn = (FloatingActionButton) rootView.findViewById(R.id.AddNewSpotBtn);
@@ -67,6 +80,12 @@ public class SpotsListFragment extends Fragment implements SpotsListAdapter.Spot
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override

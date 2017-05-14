@@ -1,11 +1,13 @@
 package com.maryf.spotkeeper;
 
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.view.View;
 
+import com.maryf.spotkeeper.contentproviders.SpotsContentProvider;
 import com.maryf.spotkeeper.model.Spot;
 
 
@@ -19,11 +21,10 @@ public class SpotsListAdapter extends RecyclerView.Adapter<SpotsListAdapter.View
         public void onSpotClick(Spot spot);
     }
 
-    private Spot[] spots;
     private SpotListAdapterListener listener;
+    private Cursor cursor;
 
-    public SpotsListAdapter(Spot[] spots, SpotListAdapterListener listener) {
-        this.spots = spots;
+    public SpotsListAdapter(SpotListAdapterListener listener) {
         this.listener = listener;
     }
 
@@ -37,21 +38,27 @@ public class SpotsListAdapter extends RecyclerView.Adapter<SpotsListAdapter.View
 
     @Override
     public void onBindViewHolder(SpotsListAdapter.ViewHolder holder, final int position) {
-        holder.mSpotName.setText(spots[position].getName());
-        holder.mSpotAddress.setText(spots[position].getAddress());
+        cursor.moveToPosition(position);
+        final Spot spot = new Spot(
+                cursor.getString(cursor.getColumnIndex(SpotsContentProvider.COLUMN_SPOT_NAME)),
+                cursor.getString(cursor.getColumnIndex(SpotsContentProvider.COLUMN_SPOT_ADDRESS))
+        );
+
+        holder.mSpotName.setText(spot.getName());
+        holder.mSpotAddress.setText(spot.getAddress());
 
         holder.mItemView.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                SpotsListAdapter.this.listener.onSpotClick(spots[position]);
+                SpotsListAdapter.this.listener.onSpotClick(spot);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return spots.length;
+        return cursor != null ? cursor.getCount() : 0;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -64,6 +71,11 @@ public class SpotsListAdapter extends RecyclerView.Adapter<SpotsListAdapter.View
             mSpotAddress = (TextView) itemLayoutView.findViewById(R.id.spot_address);
             mItemView = itemLayoutView;
         }
+    }
+
+    public void setCursor(Cursor cursor) {
+        this.cursor = cursor;
+        notifyDataSetChanged();
     }
 }
 
