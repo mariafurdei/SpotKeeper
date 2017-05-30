@@ -1,11 +1,17 @@
 package com.maryf.spotkeeper.contentproviders;
 
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
+import com.maryf.spotkeeper.Database.DatabaseHelper;
+import com.maryf.spotkeeper.Database.SpotsListTable;
 import com.maryf.spotkeeper.R;
 import com.maryf.spotkeeper.model.Spot;
 
@@ -14,13 +20,31 @@ import java.util.Arrays;
 
 public class SpotsContentProvider extends ContentProvider {
 
-    public static final Uri CONTENT_URI = Uri.parse("content://com.maryf.spotkeeper.contentproviders.SpotsContentProvider");
+    private static final String AUTHORITY = "com.maryf.spotkeeper.contentproviders.SpotsContentProvider";
+    private static final String BASE_PATH = "spots";
+    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
+            + "/" + BASE_PATH);
     public static final String COLUMN_SPOT_NAME = "spotName";
     public static final String COLUMN_SPOT_ADDRESS = "spotAddress";
-
-    ArrayList<Spot> spots = new ArrayList<Spot>();
+    public static final String TABLE_SPOTSLIST = "spotslist";
+    public static final String COLUMN_ID = "_id";
 
     public SpotsContentProvider() {
+    }
+
+    private DatabaseHelper database;
+    // used for the UriMacher
+    private static final int SPOTSLISTS = 10;
+    private static final int SPOTSLIST_ID = 20;
+
+    public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
+            + "/spots";
+
+    private static final UriMatcher sURIMatcher = new UriMatcher(
+            UriMatcher.NO_MATCH);
+    static {
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH, SPOTSLISTS);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", SPOTSLIST_ID);
     }
 
     @Override
@@ -31,26 +55,20 @@ public class SpotsContentProvider extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        // TODO: Implement this to handle requests for the MIME type of the data
         // at the given URI.
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        // TODO: Implement this to handle requests to insert a new row.
-        //throw new UnsupportedOperationException("Not yet implemented");
         Spot newSpot = new Spot(values.getAsString(COLUMN_SPOT_NAME), values.getAsString(COLUMN_SPOT_ADDRESS));
-        //spots.add(values);
+
         return uri;
     }
 
     @Override
     public boolean onCreate() {
-        // TODO: Implement this to initialize your content provider on startup.
-        for (int i = 0; i < 5; i++) {
-            spots.add(i, new Spot("Spot name " + i, "Spot address " + i));
-        }
+        database = new DatabaseHelper(getContext());
 
         return true;
     }
@@ -58,17 +76,37 @@ public class SpotsContentProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-        // TODO: Implement this to handle query requests from clients.
+        // Uisng SQLiteQueryBuilder instead of query() method
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 
-        String[] namesCol = new String[] {COLUMN_SPOT_NAME, COLUMN_SPOT_ADDRESS};
-        MatrixCursor matrixCursor = new MatrixCursor(namesCol);
-        for (int i = 0; i < spots.size(); i++) {
-            MatrixCursor.RowBuilder newRow = matrixCursor.newRow();
-            newRow.add(COLUMN_SPOT_NAME, spots.get(i).getName());
-            newRow.add(COLUMN_SPOT_ADDRESS, spots.get(i).getAddress());
+        // check if the caller has requested a column which does not exists
+        checkColumns(projection);
+
+        // Set the table
+        queryBuilder.setTables(TABLE_SPOTSLIST);
+        int uriType = sURIMatcher.match(uri);
+        switch (uriType) {
+            case SPOTSLISTS:
+                break;
+            case SPOTSLIST_ID:
+                // adding the ID to the original query
+                queryBuilder.appendWhere(COLUMN_ID + "="
+                        + uri.getLastPathSegment());
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown URI: " + uri);
         }
 
-        return matrixCursor;
+        SQLiteDatabase db = database.getWritableDatabase();
+        Cursor cursor = queryBuilder.query(db, projection, selection,
+                selectionArgs, null, null, sortOrder);
+        // make sure that potential listeners are getting notified
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
+        return cursor;
+    }
+
+    private void checkColumns(String[] projection) {
     }
 
     @Override
