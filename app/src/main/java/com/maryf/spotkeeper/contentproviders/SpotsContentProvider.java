@@ -9,6 +9,7 @@ import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 
 import com.maryf.spotkeeper.Database.DatabaseHelper;
 import com.maryf.spotkeeper.Database.SpotsListTable;
@@ -32,13 +33,10 @@ public class SpotsContentProvider extends ContentProvider {
     public SpotsContentProvider() {
     }
 
-    private DatabaseHelper database;
+    private static DatabaseHelper database;
     // used for the UriMacher
     private static final int SPOTSLISTS = 10;
     private static final int SPOTSLIST_ID = 20;
-
-    public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-            + "/spots";
 
     private static final UriMatcher sURIMatcher = new UriMatcher(
             UriMatcher.NO_MATCH);
@@ -61,9 +59,18 @@ public class SpotsContentProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        Spot newSpot = new Spot(values.getAsString(COLUMN_SPOT_NAME), values.getAsString(COLUMN_SPOT_ADDRESS));
-
-        return uri;
+        int uriType = sURIMatcher.match(uri);
+        SQLiteDatabase sqlDB = database.getWritableDatabase();
+        long id = 0;
+        switch (uriType) {
+            case SPOTSLISTS:
+                id = sqlDB.insert(TABLE_SPOTSLIST, null, values);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown URI: " + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return Uri.parse(BASE_PATH + "/" + id);
     }
 
     @Override

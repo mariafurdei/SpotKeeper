@@ -1,10 +1,12 @@
 package com.maryf.spotkeeper;
 
+import android.content.ContentValues;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.maryf.spotkeeper.contentproviders.SpotsContentProvider;
 import com.maryf.spotkeeper.fragments.NewSpotFragment;
 import com.maryf.spotkeeper.fragments.SpotDetailFragment;
 import com.maryf.spotkeeper.fragments.SpotsListFragment;
@@ -68,6 +70,10 @@ public class SpotsListActivity extends AppCompatActivity implements
     @Override
     public void onSaveNewSpotClick(Spot spot) {
         showSpotsListFragment();
+        ContentValues values = new ContentValues();
+        values.put(SpotsContentProvider.COLUMN_SPOT_NAME, spot.getName());
+        values.put(SpotsContentProvider.COLUMN_SPOT_ADDRESS, spot.getAddress());
+        getContentResolver().insert(SpotsContentProvider.CONTENT_URI, values);
         System.out.println("name: "+spot.getName()+"    address: "+spot.getAddress());
     }
 }
