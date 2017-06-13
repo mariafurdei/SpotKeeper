@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.maryf.spotkeeper.Database.DatabaseHelper;
 import com.maryf.spotkeeper.Database.SpotsListTable;
@@ -48,7 +49,34 @@ public class SpotsContentProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         // Implement this to handle requests to delete one or more rows.
-        throw new UnsupportedOperationException("Not yet implemented");
+        //throw new UnsupportedOperationException("Not yet implemented");
+        int uriType = sURIMatcher.match(uri);
+        SQLiteDatabase sqlDB = database.getWritableDatabase();
+        int rowsDeleted = 0;
+        switch (uriType) {
+            case SPOTSLISTS:
+                rowsDeleted = sqlDB.delete(TABLE_SPOTSLIST, selection, selectionArgs);
+                break;
+            case SPOTSLIST_ID:
+                String id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)) {
+                    rowsDeleted = sqlDB.delete(
+                            TABLE_SPOTSLIST,
+                            COLUMN_ID + "=" + id,
+                            null);
+                } else {
+                    rowsDeleted = sqlDB.delete(
+                            TABLE_SPOTSLIST,
+                            COLUMN_ID + "=" + id
+                            + " and " + selection,
+                            selectionArgs);
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown URI: " + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return rowsDeleted;
     }
 
     @Override

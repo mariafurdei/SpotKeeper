@@ -48,6 +48,7 @@ public class SpotsListFragment extends Fragment implements SpotsListAdapter.Spot
     public interface SpotsListFragmentListener {
         void onSpotClick(Spot spot);
         void onAddNewSpotClick();
+        void onSpotLongClick(Spot spot, View v);
     }
 
     private SpotsListFragmentListener listener;
@@ -90,6 +91,10 @@ public class SpotsListFragment extends Fragment implements SpotsListAdapter.Spot
 
     @Override
     public void onSpotClick(Spot spot) {
-        this.listener.onSpotClick(spot);
+        listener.onSpotClick(spot);
+    }
+
+    public void onSpotLongClick(Spot spot, View v) {
+        listener.onSpotLongClick(spot, v);
     }
 }

@@ -5,6 +5,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import com.maryf.spotkeeper.contentproviders.SpotsContentProvider;
 import com.maryf.spotkeeper.fragments.NewSpotFragment;
@@ -36,6 +40,22 @@ public class SpotsListActivity extends AppCompatActivity implements
         fragmentTransaction.replace(R.id.activity_spots_list, fragmentDetail);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+    }
+
+    public void onSpotLongClick(Spot spot, View v) {
+        //Creating the instance of PopupMenu
+        PopupMenu popup = new PopupMenu(SpotsListActivity.this, v);
+        //Inflating the Popup using xml file
+        popup.getMenuInflater().inflate(R.menu.spots_list_popup_menu, popup.getMenu());
+
+        //registering popup with OnMenuItemClickListener
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+                Toast.makeText(SpotsListActivity.this,"You Clicked : " + item.getTitle(),Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+        popup.show();//showing popup menu
     }
 
     @Override

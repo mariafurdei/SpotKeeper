@@ -18,7 +18,8 @@ import com.maryf.spotkeeper.model.Spot;
 public class SpotsListAdapter extends RecyclerView.Adapter<SpotsListAdapter.ViewHolder> {
 
     public interface SpotListAdapterListener {
-        public void onSpotClick(Spot spot);
+        void onSpotClick(Spot spot);
+        void onSpotLongClick(Spot spot, View v);
     }
 
     private SpotListAdapterListener listener;
@@ -30,6 +31,7 @@ public class SpotsListAdapter extends RecyclerView.Adapter<SpotsListAdapter.View
 
     @Override
     public SpotsListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
         View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.spot_list_item, null);
         ViewHolder viewHolder = new ViewHolder(itemLayoutView);
 
@@ -53,6 +55,16 @@ public class SpotsListAdapter extends RecyclerView.Adapter<SpotsListAdapter.View
             public void onClick(View v) {
                 SpotsListAdapter.this.listener.onSpotClick(spot);
             }
+        });
+
+        holder.mItemView.setOnLongClickListener(new View.OnLongClickListener() {
+
+            @Override
+            public boolean onLongClick(View v) {
+                SpotsListAdapter.this.listener.onSpotLongClick(spot, v);
+                return true;
+            }
+
         });
     }
 
