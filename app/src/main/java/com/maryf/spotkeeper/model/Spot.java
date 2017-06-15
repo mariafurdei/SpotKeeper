@@ -9,10 +9,12 @@ import java.io.Serializable;
 public class Spot implements Serializable {
     private String mName;
     private String mAddress;
+    private Long mId;
 
-    public Spot(String name, String address) {
+    public Spot(Long id, String name, String address) {
         mName = name;
         mAddress = address;
+        mId = id;
     }
 
     public String getName() {
@@ -21,5 +23,9 @@ public class Spot implements Serializable {
 
     public String getAddress() {
         return mAddress;
+    }
+
+    public Long getId() {
+        return mId;
     }
 }

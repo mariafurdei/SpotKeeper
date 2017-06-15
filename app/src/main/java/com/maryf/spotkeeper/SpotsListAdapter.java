@@ -42,6 +42,7 @@ public class SpotsListAdapter extends RecyclerView.Adapter<SpotsListAdapter.View
     public void onBindViewHolder(SpotsListAdapter.ViewHolder holder, final int position) {
         cursor.moveToPosition(position);
         final Spot spot = new Spot(
+                cursor.getLong(cursor.getColumnIndex(SpotsContentProvider.COLUMN_ID)),
                 cursor.getString(cursor.getColumnIndex(SpotsContentProvider.COLUMN_SPOT_NAME)),
                 cursor.getString(cursor.getColumnIndex(SpotsContentProvider.COLUMN_SPOT_ADDRESS))
         );

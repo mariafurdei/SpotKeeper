@@ -1,24 +1,14 @@
 package com.maryf.spotkeeper.contentproviders;
 
 import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
-
 import com.maryf.spotkeeper.Database.DatabaseHelper;
-import com.maryf.spotkeeper.Database.SpotsListTable;
-import com.maryf.spotkeeper.R;
-import com.maryf.spotkeeper.model.Spot;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class SpotsContentProvider extends ContentProvider {
 
@@ -104,7 +94,6 @@ public class SpotsContentProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         database = new DatabaseHelper(getContext());
-
         return true;
     }
 

@@ -1,5 +1,6 @@
 package com.maryf.spotkeeper;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -42,7 +43,7 @@ public class SpotsListActivity extends AppCompatActivity implements
         fragmentTransaction.commit();
     }
 
-    public void onSpotLongClick(Spot spot, View v) {
+    public void onSpotLongClick(final Spot spot, View v) {
         //Creating the instance of PopupMenu
         PopupMenu popup = new PopupMenu(SpotsListActivity.this, v);
         //Inflating the Popup using xml file
@@ -51,7 +52,10 @@ public class SpotsListActivity extends AppCompatActivity implements
         //registering popup with OnMenuItemClickListener
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
-                Toast.makeText(SpotsListActivity.this,"You Clicked : " + item.getTitle(),Toast.LENGTH_SHORT).show();
+                getContentResolver().delete(
+                        ContentUris.withAppendedId(SpotsContentProvider.CONTENT_URI, spot.getId()),
+                        null,
+                        null);
                 return true;
             }
         });
@@ -96,4 +100,6 @@ public class SpotsListActivity extends AppCompatActivity implements
         getContentResolver().insert(SpotsContentProvider.CONTENT_URI, values);
         System.out.println("name: "+spot.getName()+"    address: "+spot.getAddress());
     }
+
+
 }
