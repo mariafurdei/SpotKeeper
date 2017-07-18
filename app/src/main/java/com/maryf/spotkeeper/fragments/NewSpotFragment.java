@@ -24,6 +24,8 @@ public class NewSpotFragment extends Fragment {
 
     public NewSpotFragmentListener listener;
 
+    public NewSpotFragment() {}
+
     public NewSpotFragment(NewSpotFragmentListener listener) {
         this.listener = listener;
     }

@@ -137,6 +137,40 @@ public class SpotsContentProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
         // TODO: Implement this to handle requests to update one or more rows.
-        throw new UnsupportedOperationException("Not yet implemented");
+        //throw new UnsupportedOperationException("Not yet implemented");
+        int uriType = sURIMatcher.match(uri);
+        SQLiteDatabase sqlDB = database.getWritableDatabase();
+        int rowsUpdated = 0;
+        switch (uriType) {
+            case SPOTSLISTS:
+                rowsUpdated = sqlDB.update(
+                        TABLE_SPOTSLIST,
+                        values,
+                        selection,
+                        selectionArgs);
+                break;
+            case SPOTSLIST_ID:
+                String id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)) {
+                    rowsUpdated = sqlDB.update(
+                            TABLE_SPOTSLIST,
+                            values,
+                            COLUMN_ID + "=" + id,
+                            null);
+                } else {
+                    rowsUpdated = sqlDB.update(
+                            TABLE_SPOTSLIST,
+                            values,
+                            COLUMN_ID + "=" + id
+                            + " and "
+                            + selection,
+                            selectionArgs);
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown URI:" + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return rowsUpdated;
     }
 }

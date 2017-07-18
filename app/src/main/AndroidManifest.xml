@@ -20,7 +20,8 @@
             android:name=".contentproviders.SpotsContentProvider"
             android:authorities="com.maryf.spotkeeper.contentproviders.SpotsContentProvider"
             android:enabled="true"
-            android:exported="true"></provider>
+            android:exported="true" />
+
     </application>
 
 </manifest>

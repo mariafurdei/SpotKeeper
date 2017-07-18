@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="nav_menu_item_string_array">
+        <item>All spots</item>
+        <item>Favourites</item>
+        <item>Add new spot</item>
+    </string-array>
+
+</resources>

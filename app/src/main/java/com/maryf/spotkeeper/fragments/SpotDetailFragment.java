@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.maryf.spotkeeper.R;
@@ -18,6 +19,7 @@ import com.maryf.spotkeeper.model.Spot;
 public class SpotDetailFragment extends Fragment {
     public interface SpotDetailFragmentListener {
         void onCloseDetailsClick();
+        void onUpdateSpot(Spot spot);
     }
 
     public SpotDetailFragmentListener listener;
@@ -40,7 +42,7 @@ public class SpotDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstance) {
 
-        View rootView = inflater.inflate(R.layout.spot_details_fragment, container, false);
+        final View rootView = inflater.inflate(R.layout.spot_details_fragment, container, false);
         Button butRetToSpotsList = (Button) rootView.findViewById(R.id.return_to_spots_list);
         butRetToSpotsList.setOnClickListener(new View.OnClickListener() {
 
@@ -56,6 +58,19 @@ public class SpotDetailFragment extends Fragment {
         final Spot spot = (Spot) bundle.getSerializable("Spot");
         nameView.setText(spot.getName());
         addressView.setText(spot.getAddress());
+
+        Button butUpdateSpot = (Button) rootView.findViewById(R.id.update_spots_list_btn);
+        butUpdateSpot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText spotName = (EditText) rootView.findViewById(R.id.spot_name_detail);
+                EditText spotAddress = (EditText) rootView.findViewById(R.id.spot_address_detail);
+                Bundle bundle = getArguments();
+                Spot originalSpot = (Spot) bundle.getSerializable("Spot");
+                Spot spot = new Spot(originalSpot.getId(), spotName.getText().toString(), spotAddress.getText().toString());
+                listener.onUpdateSpot(spot);
+            }
+        });
 
         return rootView;
     }

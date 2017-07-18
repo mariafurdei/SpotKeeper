@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
@@ -7,42 +6,74 @@
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="228dp"
+        android:layout_height="72dp"
+        android:layout_gravity="left">
 
-        <TextView
-            android:text="Spot Name: "
-            android:textStyle="bold"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="72dp"
             android:layout_height="wrap_content"
-            android:id="@+id/spot_name_label" />
+            android:layout_gravity="bottom">
 
-        <TextView
-            android:text="TextView"
+            <ImageView
+                android:id="@+id/spots_list_item_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginBottom="1dp"
+                android:contentDescription="icon"
+                android:src="@drawable/ic_spots_list_item"
+                android:layout_gravity="bottom" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/spot_name" />
+            android:layout_height="72dp"
+            android:layout_gravity="left">
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="36dp">
+
+                <TextView
+                    android:text="TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:id="@+id/spot_name" />
+
+            </LinearLayout>
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="36dp">
+
+                <TextView
+                    android:text="TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@id/spot_name"
+                    android:layout_below="@id/spot_name"
+                    android:id="@+id/spot_address"
+                    android:layout_gravity="bottom" />
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:text="Spot Address: "
-            android:textStyle="bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/spot_address_label" />
-
-        <TextView
-            android:text="TextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/spot_address"/>
-
-    </LinearLayout>
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="1dip"
+        android:background="#89d15e" />
 
 </LinearLayout>
