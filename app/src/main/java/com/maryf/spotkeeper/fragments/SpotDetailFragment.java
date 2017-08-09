@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.maryf.spotkeeper.R;
@@ -20,6 +21,7 @@ public class SpotDetailFragment extends Fragment {
     public interface SpotDetailFragmentListener {
         void onCloseDetailsClick();
         void onUpdateSpot(Spot spot);
+        void onFavDetBtnClick(Spot spot);
     }
 
     public SpotDetailFragmentListener listener;
@@ -53,11 +55,28 @@ public class SpotDetailFragment extends Fragment {
         });
 
         Bundle bundle = getArguments();
+
         TextView nameView = (TextView) rootView.findViewById(R.id.spot_name_detail);
         TextView addressView = (TextView) rootView.findViewById(R.id.spot_address_detail);
+        ImageButton favFlag = (ImageButton) rootView.findViewById(R.id.add_to_fav_but_det);
+
         final Spot spot = (Spot) bundle.getSerializable("Spot");
         nameView.setText(spot.getName());
         addressView.setText(spot.getAddress());
+        if (spot.getFavFlag() == 1) {
+            favFlag.setImageResource(R.mipmap.button_pressed);
+            favFlag.setTag(1);
+        } else {
+            favFlag.setImageResource(R.mipmap.button_normal);
+            favFlag.setTag(0);
+        }
+
+        favFlag.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onFavDetBtnClick(spot);
+            }
+        });
 
         Button butUpdateSpot = (Button) rootView.findViewById(R.id.update_spots_list_btn);
         butUpdateSpot.setOnClickListener(new View.OnClickListener() {
@@ -67,12 +86,11 @@ public class SpotDetailFragment extends Fragment {
                 EditText spotAddress = (EditText) rootView.findViewById(R.id.spot_address_detail);
                 Bundle bundle = getArguments();
                 Spot originalSpot = (Spot) bundle.getSerializable("Spot");
-                Spot spot = new Spot(originalSpot.getId(), spotName.getText().toString(), spotAddress.getText().toString());
+                Spot spot = new Spot(originalSpot.getId(), spotName.getText().toString(), spotAddress.getText().toString(), 0);
                 listener.onUpdateSpot(spot);
             }
         });
 
         return rootView;
     }
-
 }

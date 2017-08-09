@@ -39,7 +39,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/new_spot_name_label"
-            android:id="@+id/new_spot_address_label" />
+            android:id="@+id/new_spot_address_label"
+            android:enabled="true"/>
 
         <EditText
             android:id="@+id/new_spot_address_edit_text"

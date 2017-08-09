@@ -31,7 +31,8 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <TextView
             android:text="Spot address details: "
@@ -40,8 +41,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/spot_name_details_label"
             android:id="@+id/spot_address_details_label" />
-
-
 
         <EditText
             android:id="@+id/spot_address_detail"
@@ -52,6 +51,24 @@
             android:layout_alignBaseline="@id/spot_address_details_label"
             android:text=""
             android:inputType="text" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ImageButton
+            android:id="@+id/add_to_fav_but_det"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/fav_but_draw_source"
+            android:focusable="false"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:padding="0dp"/>
 
     </LinearLayout>
 
@@ -74,8 +91,8 @@
             android:text="OK"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
             android:layout_weight=".50"
             android:id="@+id/update_spots_list_btn"
             android:background="@android:color/holo_green_light" />

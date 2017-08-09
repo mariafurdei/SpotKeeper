@@ -19,7 +19,8 @@ public class SpotsListTable {
             + "("
             + SpotsContentProvider.COLUMN_ID + " integer primary key autoincrement, "
             + SpotsContentProvider.COLUMN_SPOT_NAME + " text not null, "
-            + SpotsContentProvider.COLUMN_SPOT_ADDRESS + " text not null"
+            + SpotsContentProvider.COLUMN_SPOT_ADDRESS + " text not null, "
+            + SpotsContentProvider.COLUMN_FAV_FL + " integer "
             + ");";
 
     public static void onCreate(SQLiteDatabase database) {
@@ -29,11 +30,13 @@ public class SpotsListTable {
             SpotsContentProvider.TABLE_SPOTSLIST +
                     "(" + SpotsContentProvider.COLUMN_ID +
                     "," + SpotsContentProvider.COLUMN_SPOT_NAME +
-                    "," + SpotsContentProvider.COLUMN_SPOT_ADDRESS + ")" +
+                    "," + SpotsContentProvider.COLUMN_SPOT_ADDRESS +
+                    "," + SpotsContentProvider.COLUMN_FAV_FL + ")" +
                     " VALUES( " +
                     i +
                     ", 'Spot name" + i + "'" +
                     ", 'Spot address" + i + "'" +
+                    ", " + 0 +
                     ");"
             );
         }

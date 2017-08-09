@@ -20,6 +20,7 @@ public class SpotsContentProvider extends ContentProvider {
     public static final String COLUMN_SPOT_ADDRESS = "spotAddress";
     public static final String TABLE_SPOTSLIST = "spotslist";
     public static final String COLUMN_ID = "_id";
+    public static final String COLUMN_FAV_FL = "favFlag" ;
 
     public SpotsContentProvider() {
     }

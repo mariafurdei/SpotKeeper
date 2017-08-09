@@ -49,7 +49,7 @@ public class NewSpotFragment extends Fragment {
             public void onClick(View v) {
                 EditText spotName = (EditText) rootView.findViewById(R.id.new_spot_name_edit_text);
                 EditText spotAddress = (EditText) rootView.findViewById(R.id.new_spot_address_edit_text);
-                Spot spot = new Spot(null, spotName.getText().toString(), spotAddress.getText().toString());
+                Spot spot = new Spot(null, spotName.getText().toString(), spotAddress.getText().toString(), 0);
                 listener.onSaveNewSpotClick(spot);
             }
         });

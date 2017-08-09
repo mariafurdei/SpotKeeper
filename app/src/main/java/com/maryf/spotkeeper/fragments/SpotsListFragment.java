@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.LinearLayoutManager;
+import android.widget.ImageButton;
 
 import com.maryf.spotkeeper.R;
 import com.maryf.spotkeeper.contentproviders.SpotsContentProvider;
@@ -24,8 +25,14 @@ import com.maryf.spotkeeper.SpotsListAdapter;
  * Created by maryf on 4/5/2017.
  */
 
-public class SpotsListFragment extends Fragment implements SpotsListAdapter.SpotListAdapterListener, LoaderManager.LoaderCallbacks<Cursor> {
-    private static final String[] CONTACTS_SUMMARY_PROJECTION = {SpotsContentProvider.COLUMN_ID, SpotsContentProvider.COLUMN_SPOT_NAME, SpotsContentProvider.COLUMN_SPOT_ADDRESS};
+public class SpotsListFragment extends Fragment implements
+        SpotsListAdapter.SpotListAdapterListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String[] CONTACTS_SUMMARY_PROJECTION = {
+            SpotsContentProvider.COLUMN_ID,
+            SpotsContentProvider.COLUMN_SPOT_NAME,
+            SpotsContentProvider.COLUMN_SPOT_ADDRESS,
+            SpotsContentProvider.COLUMN_FAV_FL};
 
     private SpotsListAdapter spotsListAdapter;
 
@@ -51,6 +58,7 @@ public class SpotsListFragment extends Fragment implements SpotsListAdapter.Spot
         void onSpotClick(Spot spot);
         void onAddNewSpotClick();
         void onSpotLongClick(Spot spot, View v);
+        void onFavButClick(Spot spot);
     }
 
     private SpotsListFragmentListener listener;
@@ -98,5 +106,9 @@ public class SpotsListFragment extends Fragment implements SpotsListAdapter.Spot
 
     public void onSpotLongClick(Spot spot, View v) {
         listener.onSpotLongClick(spot, v);
+    }
+
+    public void onFavButClick(Spot spot) {
+        listener.onFavButClick(spot);
     }
 }

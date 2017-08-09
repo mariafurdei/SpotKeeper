@@ -10,11 +10,13 @@ public class Spot implements Serializable {
     private String mName;
     private String mAddress;
     private Long mId;
+    private int mFavFlag;
 
-    public Spot(Long id, String name, String address) {
+    public Spot(Long id, String name, String address, int favFlag) {
         mName = name;
         mAddress = address;
         mId = id;
+        mFavFlag = favFlag;
     }
 
     public String getName() {
@@ -27,5 +29,9 @@ public class Spot implements Serializable {
 
     public Long getId() {
         return mId;
+    }
+
+    public int getFavFlag() {
+        return mFavFlag;
     }
 }

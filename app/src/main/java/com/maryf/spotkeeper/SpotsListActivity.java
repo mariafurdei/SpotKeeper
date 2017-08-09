@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.PopupMenu;
 
 import com.maryf.spotkeeper.contentproviders.SpotsContentProvider;
@@ -48,11 +49,7 @@ public class SpotsListActivity extends AppCompatActivity implements
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        SpotsListFragment fragmentList = new SpotsListFragment(this);
-        fragmentTransaction.add(R.id.activity_spots_list_content, fragmentList);
-        fragmentTransaction.commit();
+         showSpotsListFragment();
     }
 
     @Override
@@ -93,11 +90,11 @@ public class SpotsListActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         if (id == R.id.nav_all_spots) {
-            System.out.println("nav_all_spots");
+            showSpotsListFragment();
         } else if (id == R.id.nav_favourites) {
             System.out.println("nav_favourites");
         } else if (id == R.id.nav_addnewspot) {
-            System.out.println("nav_addnewspot");
+            onAddNewSpotClick();
         } else if (id == R.id.nav_gallery) {
             System.out.println("nav_gallery");
         }
@@ -144,14 +141,21 @@ public class SpotsListActivity extends AppCompatActivity implements
     @Override
     public void onUpdateSpot(final Spot spot) {
         ContentValues values = new ContentValues();
+        ImageButton favFlagBtn = (ImageButton) findViewById(R.id.add_to_fav_but_det);
         values.put(SpotsContentProvider.COLUMN_SPOT_NAME, spot.getName());
         values.put(SpotsContentProvider.COLUMN_SPOT_ADDRESS, spot.getAddress());
+        if ((Integer) favFlagBtn.getTag() == 0) {
+            values.put(SpotsContentProvider.COLUMN_FAV_FL, 0);
+        } else {
+            values.put(SpotsContentProvider.COLUMN_FAV_FL, 1);
+        }
 
         getContentResolver().update(
                 ContentUris.withAppendedId(SpotsContentProvider.CONTENT_URI, spot.getId()),
                 values,
                 null,
                 null);
+        showSpotsListFragment();
    }
 
     @Override
@@ -185,6 +189,36 @@ public class SpotsListActivity extends AppCompatActivity implements
         values.put(SpotsContentProvider.COLUMN_SPOT_NAME, spot.getName());
         values.put(SpotsContentProvider.COLUMN_SPOT_ADDRESS, spot.getAddress());
         getContentResolver().insert(SpotsContentProvider.CONTENT_URI, values);
+    }
+
+    public void onFavButClick(Spot spot) {
+        ContentValues values = new ContentValues();
+        values.put(SpotsContentProvider.COLUMN_SPOT_NAME, spot.getName());
+        values.put(SpotsContentProvider.COLUMN_SPOT_ADDRESS, spot.getAddress());
+        //System.out.println(String.valueOf(spot.getFavFlag()));
+        if (spot.getFavFlag() == 0) {
+            values.put(String.valueOf(SpotsContentProvider.COLUMN_FAV_FL),1);
+        } else
+        {
+            values.put(String.valueOf(SpotsContentProvider.COLUMN_FAV_FL),0);
+        }
+
+        getContentResolver().update(
+                ContentUris.withAppendedId(SpotsContentProvider.CONTENT_URI, spot.getId()),
+                values,
+                null,
+                null);
+    }
+
+    public void onFavDetBtnClick(Spot spot) {
+        ImageButton favFlagBtn = (ImageButton) findViewById(R.id.add_to_fav_but_det);
+        if ((Integer) favFlagBtn.getTag() == 0) {
+            favFlagBtn.setTag(1);
+            favFlagBtn.setImageResource(R.mipmap.button_pressed);
+        } else {
+            favFlagBtn.setTag(0);
+            favFlagBtn.setImageResource(R.mipmap.button_normal);
+        }
     }
 
     @Override
