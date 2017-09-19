@@ -31,8 +31,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="wrap_content">
 
         <TextView
             android:text="Spot address details: "
@@ -54,23 +53,25 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:orientation="horizontal"
+    <ImageButton
+        android:id="@+id/add_to_fav_but_det"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/fav_but_draw_source"
+        android:focusable="false"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:padding="0dp"/>
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        class="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <ImageButton
-            android:id="@+id/add_to_fav_but_det"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/fav_but_draw_source"
-            android:focusable="false"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:padding="0dp"/>
-
-    </LinearLayout>
+        android:layout_weight="1"
+        tools:context="com.maryf.spotkeeper.MapsActivity" />
 
     <LinearLayout
         android:orientation="horizontal"

@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.PopupMenu;
 
 import com.maryf.spotkeeper.contentproviders.SpotsContentProvider;
+import com.maryf.spotkeeper.fragments.FavouriteSpotsFragment;
 import com.maryf.spotkeeper.fragments.NewSpotFragment;
 import com.maryf.spotkeeper.fragments.SpotDetailFragment;
 import com.maryf.spotkeeper.fragments.SpotsListFragment;
@@ -84,6 +85,15 @@ public class SpotsListActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    public void onNavItemFavSelected () {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        FavouriteSpotsFragment newFavSpotsFragment = new FavouriteSpotsFragment(this);
+        fragmentTransaction.replace(R.id.activity_spots_list_content, newFavSpotsFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -92,7 +102,7 @@ public class SpotsListActivity extends AppCompatActivity implements
         if (id == R.id.nav_all_spots) {
             showSpotsListFragment();
         } else if (id == R.id.nav_favourites) {
-            System.out.println("nav_favourites");
+            onNavItemFavSelected();
         } else if (id == R.id.nav_addnewspot) {
             onAddNewSpotClick();
         } else if (id == R.id.nav_gallery) {

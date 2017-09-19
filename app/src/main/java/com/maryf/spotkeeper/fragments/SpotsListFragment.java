@@ -28,7 +28,7 @@ import com.maryf.spotkeeper.SpotsListAdapter;
 public class SpotsListFragment extends Fragment implements
         SpotsListAdapter.SpotListAdapterListener,
         LoaderManager.LoaderCallbacks<Cursor> {
-    private static final String[] CONTACTS_SUMMARY_PROJECTION = {
+    public static final String[] CONTACTS_SUMMARY_PROJECTION = {
             SpotsContentProvider.COLUMN_ID,
             SpotsContentProvider.COLUMN_SPOT_NAME,
             SpotsContentProvider.COLUMN_SPOT_ADDRESS,
