@@ -50,7 +50,7 @@ public class SpotsListActivity extends AppCompatActivity implements
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-         showSpotsListFragment();
+        showSpotsListFragment();
     }
 
     @Override
@@ -229,6 +229,11 @@ public class SpotsListActivity extends AppCompatActivity implements
             favFlagBtn.setTag(0);
             favFlagBtn.setImageResource(R.mipmap.button_normal);
         }
+    }
+
+    @Override
+    public void onMapClick() {
+
     }
 
     @Override
