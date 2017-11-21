@@ -3,6 +3,7 @@ package com.maryf.spotkeeper;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -44,9 +45,9 @@ public class SpotsListAdapter extends RecyclerView.Adapter<SpotsListAdapter.View
     public void onBindViewHolder(SpotsListAdapter.ViewHolder holder, final int position) {
         cursor.moveToPosition(position);
         if (cursor.getInt(cursor.getColumnIndex(SpotsContentProvider.COLUMN_FAV_FL)) == 1) {
-             holder.mFavFlag.setImageResource(R.mipmap.button_pressed);
+             holder.mFavFlag.setImageResource(R.mipmap.ic_fav_but_pressed);
         } else {
-            holder.mFavFlag.setImageResource(R.mipmap.button_normal);
+            holder.mFavFlag.setImageResource(R.mipmap.ic_fav_but_unpressed);
         }
         final Spot spot = new Spot(
                 cursor.getLong(cursor.getColumnIndex(SpotsContentProvider.COLUMN_ID)),

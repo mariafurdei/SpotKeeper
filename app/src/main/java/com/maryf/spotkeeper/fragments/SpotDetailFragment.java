@@ -1,16 +1,22 @@
 package com.maryf.spotkeeper.fragments;
 
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -18,8 +24,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
+import com.google.android.gms.maps.OnStreetViewPanoramaReadyCallback;
+import com.google.android.gms.maps.StreetViewPanorama;
+import com.google.android.gms.maps.SupportStreetViewPanoramaFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.maryf.spotkeeper.R;
 import com.maryf.spotkeeper.model.Spot;
@@ -36,7 +44,6 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private MapView mapView;
-    private Marker marker;
 
     public interface SpotDetailFragmentListener {
         void onCloseDetailsClick();
@@ -44,8 +51,6 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         void onUpdateSpot(Spot spot);
 
         void onFavDetBtnClick(Spot spot);
-
-        void onMapClick();
     }
 
     public SpotDetailFragmentListener listener;
@@ -88,10 +93,10 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         nameView.setText(spot.getName());
         addressView.setText(spot.getAddress());
         if (spot.getFavFlag() == 1) {
-            favFlag.setImageResource(R.mipmap.button_pressed);
+            favFlag.setImageResource(R.mipmap.ic_fav_but_pressed);
             favFlag.setTag(1);
         } else {
-            favFlag.setImageResource(R.mipmap.button_normal);
+            favFlag.setImageResource(R.mipmap.ic_fav_but_unpressed);
             favFlag.setTag(0);
         }
 
@@ -115,9 +120,18 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        // Inflate the layout for this fragment
-        inflater.inflate(R.layout.spot_details_fragment, container, false);
-        return rootView;
+        ImageView mImageview = (ImageView) rootView.findViewById(R.id.spot_photo_iv);
+        mImageview.setImageResource(R.mipmap.ic_launcher_spot_photo);
+        mImageview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("Open folder");
+            }
+        });
+
+        setHasOptionsMenu(true);
+
+      return rootView;
     }
 
     @Override
@@ -129,44 +143,75 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.nav_menu, menu);
+        MenuItem item = menu.findItem(R.id.menu_item_share);
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.menu_item_share){
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+            sendIntent.setType("text/plain");
+            startActivity(Intent.createChooser(sendIntent, "This spot" ));
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
         Geocoder geocoder = new Geocoder(getActivity());
 
         Bundle bundle = getArguments();
         final Spot spot = (Spot) bundle.getSerializable("Spot");
         String spotAddress = spot.getAddress();
+
         try {
             List<Address> addresses = geocoder.getFromLocationName(spotAddress, 1);
             if (addresses.size() > 0) {
-                double latitude = addresses.get(0).getLatitude();
-                double longitude = addresses.get(0).getLongitude();
+                final double latitude = addresses.get(0).getLatitude();
+                final double longitude = addresses.get(0).getLongitude();
 
                 LatLng spotOnMap = new LatLng(latitude, longitude);
                 mMap.addMarker(new MarkerOptions().position(spotOnMap).title("Marker in" + spotAddress));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(spotOnMap,15));
                 mMap.animateCamera(CameraUpdateFactory.zoomIn());
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+
+                FragmentManager fm = getChildFragmentManager();
+                SupportStreetViewPanoramaFragment sVpFragment = (SupportStreetViewPanoramaFragment) fm.findFragmentByTag("sVpFragment");
+                if (sVpFragment == null) {
+                    sVpFragment = new SupportStreetViewPanoramaFragment();
+                    android.support.v4.app.FragmentTransaction ft = fm.beginTransaction();
+                    ft.add(R.id.streetViewPanoramaFragmentContainer, sVpFragment, "sVpFragment");
+                    ft.commit();
+                    fm.executePendingTransactions();
+                }
+                sVpFragment.getStreetViewPanoramaAsync(new OnStreetViewPanoramaReadyCallback() {
+                    @Override
+                    public void onStreetViewPanoramaReady(StreetViewPanorama streetViewPanorama) {
+                        StreetViewPanorama mPanorama = streetViewPanorama;
+                        mPanorama.setPosition(new LatLng(latitude, longitude));
+                    }
+                });
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
                 Log.d("Map","Map clicked");
-                //marker.remove();
                 mMap.clear();
                 mMap.addMarker(new MarkerOptions().position(latLng).title("New marker"));
-                // position = mMap.getCameraPosition().target;
 
                 Geocoder geocoder = new Geocoder(getActivity());
                 try {
@@ -175,6 +220,11 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
                             mMap.getCameraPosition().target.longitude, 1);
                     String address = addresses.get(0).getAddressLine(0);
                     System.out.println(address);
+                    System.out.println("new marker should be here");
+
+                    View rootView = getView();
+                    TextView addressView = (TextView) rootView.findViewById(R.id.spot_address_detail);
+                    addressView.setText(address.toString());
 
                 } catch (IOException e) {
                     e.printStackTrace();

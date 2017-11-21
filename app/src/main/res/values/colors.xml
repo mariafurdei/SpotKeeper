@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#ff4081</color>
+    <color name="colorPrimary">#FFC107</color>
+    <color name="colorPrimaryDark">#FFA000</color>
+    <color name="colorAccent">#FF8F00</color>
+    <color name="colorBackground">#FFE57F</color>
+
+    <color name="navMenuPrimary">#FFC107</color>
+    <color name="spotsListBackground">#CCFF90</color>
+
+    <color name="textColor">#000000</color>
+
+    <color name="popupMenuColor">#FF6F00</color>
+    <color name="okButtonColor">#FFC400</color>
+    <color name="cancelButtonColor">#FF6F00</color>
 </resources>

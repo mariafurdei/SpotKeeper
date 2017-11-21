@@ -7,7 +7,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/SpotKeeperTheme">
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -30,7 +30,6 @@
             android:authorities="com.maryf.spotkeeper.contentproviders.SpotsContentProvider"
             android:enabled="true"
             android:exported="true" />
-
 
     </application>
 

@@ -2,6 +2,7 @@ package com.maryf.spotkeeper;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
+import android.widget.ShareActionProvider;
 
 import com.maryf.spotkeeper.contentproviders.SpotsContentProvider;
 import com.maryf.spotkeeper.fragments.FavouriteSpotsFragment;
@@ -29,6 +31,8 @@ public class SpotsListActivity extends AppCompatActivity implements
         SpotDetailFragment.SpotDetailFragmentListener,
         NewSpotFragment.NewSpotFragmentListener,
         NavigationView.OnNavigationItemSelectedListener {
+
+    private ShareActionProvider mShareActionProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,18 +59,18 @@ public class SpotsListActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.activity_spots_list);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+        showSpotsListFragment();
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.nav_menu, menu);
+
+        MenuItem item = menu.findItem(R.id.menu_item_share);
+        item.setVisible(false);
+
         return true;
     }
 
@@ -80,6 +84,14 @@ public class SpotsListActivity extends AppCompatActivity implements
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+
+        if (id == R.id.menu_item_share) {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+            sendIntent.setType("text/plain");
+            startActivity(Intent.createChooser(sendIntent, "This spot" ));
         }
 
         return super.onOptionsItemSelected(item);
@@ -205,7 +217,6 @@ public class SpotsListActivity extends AppCompatActivity implements
         ContentValues values = new ContentValues();
         values.put(SpotsContentProvider.COLUMN_SPOT_NAME, spot.getName());
         values.put(SpotsContentProvider.COLUMN_SPOT_ADDRESS, spot.getAddress());
-        //System.out.println(String.valueOf(spot.getFavFlag()));
         if (spot.getFavFlag() == 0) {
             values.put(String.valueOf(SpotsContentProvider.COLUMN_FAV_FL),1);
         } else
@@ -224,16 +235,11 @@ public class SpotsListActivity extends AppCompatActivity implements
         ImageButton favFlagBtn = (ImageButton) findViewById(R.id.add_to_fav_but_det);
         if ((Integer) favFlagBtn.getTag() == 0) {
             favFlagBtn.setTag(1);
-            favFlagBtn.setImageResource(R.mipmap.button_pressed);
+            favFlagBtn.setImageResource(R.mipmap.ic_fav_but_pressed);
         } else {
             favFlagBtn.setTag(0);
-            favFlagBtn.setImageResource(R.mipmap.button_normal);
+            favFlagBtn.setImageResource(R.mipmap.ic_fav_but_unpressed);
         }
-    }
-
-    @Override
-    public void onMapClick() {
-
     }
 
     @Override
