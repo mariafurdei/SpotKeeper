@@ -1,75 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/spot_list_item">
 
+    <TextView
+        android:text="Name: "
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:id="@+id/spot_name_details_label"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:gravity="bottom"
+        android:paddingBottom="0dp"/>
+
+    <EditText
+        android:id="@+id/spot_name_detail"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginLeft="14dp"
+        android:layout_marginRight="16dp"
+        android:inputType="text"
+        android:paddingTop="0dp"/>
+
+    <TextView
+        android:text="Address: "
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:id="@+id/spot_address_details_label"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:paddingBottom="0dp"/>
+
+    <EditText
+        android:id="@+id/spot_address_detail"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@id/spot_name_detail"
+        android:text=""
+        android:inputType="text"
+        android:layout_marginLeft="14dp"
+        android:layout_marginRight="16dp"
+        android:paddingTop="0dp"/>
+
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:text="Spot name details: "
-            android:textStyle="bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/spot_name_details_label" />
-
-        <EditText
-            android:id="@+id/spot_name_detail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/spot_name_details_label"
-            android:layout_alignBaseline="@id/spot_name_details_label"
-            android:text=""
-            android:inputType="text" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:text="Spot address details: "
-            android:textStyle="bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/spot_name_details_label"
-            android:id="@+id/spot_address_details_label" />
-
-        <EditText
-            android:id="@+id/spot_address_detail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/spot_address_details_label"
-            android:layout_below="@id/spot_name_detail"
-            android:layout_alignBaseline="@id/spot_address_details_label"
-            android:text=""
-            android:inputType="text" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:id="@+id/streetViewPanoramaFragmentContainer"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:orientation="horizontal" >
-        </LinearLayout>
+            android:orientation="horizontal"
+            android:layout_marginLeft="16dp"></LinearLayout>
 
-
-        <ImageView
-            android:id="@+id/spot_photo_iv"
-            android:layout_width="100dp"
-            android:layout_height="100dp"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <ImageButton
             android:id="@+id/add_to_fav_but_det"
@@ -79,7 +75,9 @@
             android:focusable="false"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:padding="0dp"/>
+            android:padding="0dp"
+            android:background="@android:color/transparent"
+            android:layout_marginRight="16dp"/>
 
     </LinearLayout>
 
@@ -87,7 +85,13 @@
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:layout_margin="16dp"/>
+
+    <!--<ImageView
+        android:id="@+id/spot_photo_iv"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>-->
 
     <LinearLayout
         android:orientation="horizontal"
@@ -102,7 +106,12 @@
             android:layout_alignParentLeft="true"
             android:layout_weight=".50"
             android:id="@+id/return_to_spots_list"
-            android:background="@color/cancelButtonColor"/>
+            android:background="@color/colorButton"/>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#FFFFFF" />
 
         <Button
             android:text="OK"
@@ -112,7 +121,7 @@
             android:layout_alignParentRight="true"
             android:layout_weight=".50"
             android:id="@+id/update_spots_list_btn"
-            android:background="@color/okButtonColor"/>
+            android:background="@color/colorButton"/>
 
     </LinearLayout>
 

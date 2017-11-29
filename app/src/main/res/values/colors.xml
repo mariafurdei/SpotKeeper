@@ -3,7 +3,13 @@
     <color name="colorPrimary">#FFC107</color>
     <color name="colorPrimaryDark">#FFA000</color>
     <color name="colorAccent">#FF8F00</color>
-    <color name="colorBackground">#FFE57F</color>
+    <!--<color name="colorBackground">#FFE57F</color>-->
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorButton">#FFA000</color>
+    <color name="colorGradStart">#FFE57F</color>
+    <color name="colorGradMid">#FFD740</color>
+    <color name="colorGradEnd">#FFC400</color>
+
 
     <color name="navMenuPrimary">#FFC107</color>
     <color name="spotsListBackground">#CCFF90</color>

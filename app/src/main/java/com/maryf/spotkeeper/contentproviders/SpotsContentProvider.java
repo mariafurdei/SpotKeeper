@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 import com.maryf.spotkeeper.Database.DatabaseHelper;
+import com.maryf.spotkeeper.Database.DatabaseHelperFactory;
+import com.maryf.spotkeeper.Database.DatabaseHelperFactoryImpl;
 
 public class SpotsContentProvider extends ContentProvider {
 
@@ -22,20 +24,26 @@ public class SpotsContentProvider extends ContentProvider {
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_FAV_FL = "favFlag" ;
 
+    private DatabaseHelperFactory mDatabaseHelperFactory;
+
+    private UriMatcherFactory mUriMatcherFactory;
+
     public SpotsContentProvider() {
+        mDatabaseHelperFactory = new DatabaseHelperFactoryImpl();
+        mUriMatcherFactory = new UriMatcherFactoryImpl();
+    }
+
+    public SpotsContentProvider(DatabaseHelperFactory databaseHelperFactory, UriMatcherFactory uriMatcherFactory) {
+        mDatabaseHelperFactory = databaseHelperFactory;
+        mUriMatcherFactory = uriMatcherFactory;
     }
 
     private static DatabaseHelper database;
     // used for the UriMacher
-    private static final int SPOTSLISTS = 10;
-    private static final int SPOTSLIST_ID = 20;
+    public static final int SPOTSLISTS = 10;
+    public static final int SPOTSLIST_ID = 20;
 
-    private static final UriMatcher sURIMatcher = new UriMatcher(
-            UriMatcher.NO_MATCH);
-    static {
-        sURIMatcher.addURI(AUTHORITY, BASE_PATH, SPOTSLISTS);
-        sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", SPOTSLIST_ID);
-    }
+    private static UriMatcher sURIMatcher;
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
@@ -94,7 +102,10 @@ public class SpotsContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        database = new DatabaseHelper(getContext());
+        database = mDatabaseHelperFactory.create(getContext());
+        sURIMatcher = mUriMatcherFactory.create();
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH, SPOTSLISTS);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", SPOTSLIST_ID);
         return true;
     }
 

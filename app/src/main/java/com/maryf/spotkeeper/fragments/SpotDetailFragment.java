@@ -120,14 +120,14 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        ImageView mImageview = (ImageView) rootView.findViewById(R.id.spot_photo_iv);
-        mImageview.setImageResource(R.mipmap.ic_launcher_spot_photo);
-        mImageview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                System.out.println("Open folder");
-            }
-        });
+        //ImageView mImageview = (ImageView) rootView.findViewById(R.id.spot_photo_iv);
+        //mImageview.setImageResource(R.mipmap.ic_launcher_spot_photo);
+        //mImageview.setOnClickListener(new View.OnClickListener() {
+          //  @Override
+            ///public void onClick(View v) {
+               // System.out.println("Open folder");
+           // }
+//        });
 
         setHasOptionsMenu(true);
 
@@ -154,7 +154,14 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         if(id == R.id.menu_item_share){
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+
+            Bundle bundle = getArguments();
+            final Spot spot = (Spot) bundle.getSerializable("Spot");
+            String spotAddress = spot.getAddress();
+            String spotName = spot.getName();
+
+            sendIntent.putExtra(Intent.EXTRA_TEXT, spotName + ", " + spotAddress);
+
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, "This spot" ));
             return true;
@@ -206,30 +213,31 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
             e.printStackTrace();
         }
 
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                Log.d("Map","Map clicked");
-                mMap.clear();
-                mMap.addMarker(new MarkerOptions().position(latLng).title("New marker"));
+            mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    Log.d("Map", "Map clicked");
+                    mMap.clear();
+                    mMap.addMarker(new MarkerOptions().position(latLng).title("New spot"));
 
-                Geocoder geocoder = new Geocoder(getActivity());
-                try {
-                    List<Address> addresses = geocoder.getFromLocation(
-                            mMap.getCameraPosition().target.latitude,
-                            mMap.getCameraPosition().target.longitude, 1);
-                    String address = addresses.get(0).getAddressLine(0);
-                    System.out.println(address);
-                    System.out.println("new marker should be here");
+                    Geocoder geocoder = new Geocoder(getActivity());
+                    try {
+                        List<Address> addresses = geocoder.getFromLocation(
+                                mMap.getCameraPosition().target.latitude,
+                                mMap.getCameraPosition().target.longitude, 1);
 
-                    View rootView = getView();
-                    TextView addressView = (TextView) rootView.findViewById(R.id.spot_address_detail);
-                    addressView.setText(address.toString());
+                        String address = (addresses != null && addresses.size() > 0)
+                                ? addresses.get(0).getAddressLine(0)
+                                : "Unknown";
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+                        View rootView = getView();
+                        TextView addressView = (TextView) rootView.findViewById(R.id.spot_address_detail);
+                        addressView.setText(address);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
     }
 }

@@ -2,11 +2,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="72dp">
+    android:layout_height="108dp">
 
     <ImageView
         android:id="@+id/spots_list_item_icon"
-        android:layout_width="72dp"
+        android:layout_width="56dp"
         android:layout_height="40dp"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="16dp"
@@ -19,29 +19,38 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="108dp"
         android:layout_marginRight="56dp"
         android:orientation="vertical"
         android:layout_toRightOf="@id/spots_list_item_icon">
 
         <TextView
             android:id="@+id/spot_name"
-            android:text="TextView"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:textStyle="bold"
+            android:layout_height="26dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="0dp"
             android:layout_toRightOf="@id/spots_list_item_icon"
-            android:layout_alignParentTop="true"/>
+            android:layout_weight="1"
+            android:text="TextView"
+            android:textStyle="bold"
+            android:gravity="bottom"/>
 
         <TextView
             android:id="@+id/spot_address"
             android:text="TextView"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="54dp"
             android:layout_below="@id/spot_name"
             android:layout_gravity="bottom"
-            android:layout_toRightOf="@id/spots_list_item_icon">
+            android:layout_toRightOf="@id/spots_list_item_icon"
+            android:layout_marginBottom="12dp"
+            android:layout_marginTop="0dp"
+            android:gravity="top"
+            android:ellipsize="middle"
+            android:maxLength="100"
+            android:layout_weight="0.71">
 
         </TextView>
 
@@ -61,9 +70,6 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="16dp"/>
 
-    <View
-        android:layout_width="wrap_content"
-        android:layout_height="1dip"
-        android:background="#FF8F00" />
+    <View style="@style/Divider"/>
 
 </RelativeLayout>
