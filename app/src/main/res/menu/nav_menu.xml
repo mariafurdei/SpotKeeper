@@ -7,7 +7,5 @@
         app:showAsAction="always"
         android:orderInCategory="10"
         android:title="Share"
-        android:icon="@drawable/ic_share_btn"
-        app:actionProviderClass="android.widget.ShareActionProvider" />
-
+        android:icon="@drawable/ic_share_btn" />
 </menu>

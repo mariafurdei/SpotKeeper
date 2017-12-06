@@ -6,6 +6,7 @@ import android.location.Geocoder;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -120,15 +121,6 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        //ImageView mImageview = (ImageView) rootView.findViewById(R.id.spot_photo_iv);
-        //mImageview.setImageResource(R.mipmap.ic_launcher_spot_photo);
-        //mImageview.setOnClickListener(new View.OnClickListener() {
-          //  @Override
-            ///public void onClick(View v) {
-               // System.out.println("Open folder");
-           // }
-//        });
-
         setHasOptionsMenu(true);
 
       return rootView;
@@ -142,13 +134,13 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         mapView.getMapAsync(this);
     }
 
-
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.nav_menu, menu);
-        MenuItem item = menu.findItem(R.id.menu_item_share);
     }
 
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.menu_item_share){
@@ -166,7 +158,6 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
             startActivity(Intent.createChooser(sendIntent, "This spot" ));
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
