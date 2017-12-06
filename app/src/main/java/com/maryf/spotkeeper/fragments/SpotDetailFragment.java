@@ -225,6 +225,25 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
                         TextView addressView = (TextView) rootView.findViewById(R.id.spot_address_detail);
                         addressView.setText(address);
 
+                        FragmentManager fm = getChildFragmentManager();
+                        SupportStreetViewPanoramaFragment sVpFragment = (SupportStreetViewPanoramaFragment) fm.findFragmentByTag("sVpFragment");
+                        if (sVpFragment == null) {
+                            sVpFragment = new SupportStreetViewPanoramaFragment();
+                            android.support.v4.app.FragmentTransaction ft = fm.beginTransaction();
+                            ft.add(R.id.streetViewPanoramaFragmentContainer, sVpFragment, "sVpFragment");
+                            ft.commit();
+                            fm.executePendingTransactions();
+                        }
+                        sVpFragment.getStreetViewPanoramaAsync(new OnStreetViewPanoramaReadyCallback() {
+                            @Override
+                            public void onStreetViewPanoramaReady(StreetViewPanorama streetViewPanorama) {
+                                StreetViewPanorama mPanorama = streetViewPanorama;
+                                mPanorama.setPosition(new LatLng(
+                                        mMap.getCameraPosition().target.latitude,
+                                        mMap.getCameraPosition().target.longitude));
+                            }
+                        });
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
