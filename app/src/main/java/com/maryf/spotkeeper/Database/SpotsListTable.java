@@ -25,21 +25,6 @@ public class SpotsListTable {
 
     public static void onCreate(SQLiteDatabase database) {
         database.execSQL(TABLE_CREATE);
-        for (int i = 0; i < 5; i++) {
-            database.execSQL("INSERT INTO " +
-            SpotsContentProvider.TABLE_SPOTSLIST +
-                    "(" + SpotsContentProvider.COLUMN_ID +
-                    "," + SpotsContentProvider.COLUMN_SPOT_NAME +
-                    "," + SpotsContentProvider.COLUMN_SPOT_ADDRESS +
-                    "," + SpotsContentProvider.COLUMN_FAV_FL + ")" +
-                    " VALUES( " +
-                    i +
-                    ", 'Spot name" + i + "'" +
-                    ", 'Spot address" + i + "'" +
-                    ", " + 0 +
-                    ");"
-            );
-        }
     }
 
     public static void onUpgrade(SQLiteDatabase database, int oldVersion,

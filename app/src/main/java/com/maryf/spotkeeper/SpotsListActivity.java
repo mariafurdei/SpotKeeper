@@ -18,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
-import android.support.v7.widget.ShareActionProvider;
 
 import com.maryf.spotkeeper.contentproviders.SpotsContentProvider;
 import com.maryf.spotkeeper.fragments.FavouriteSpotsFragment;
@@ -32,9 +31,6 @@ public class SpotsListActivity extends AppCompatActivity implements
         SpotDetailFragment.SpotDetailFragmentListener,
         NewSpotFragment.NewSpotFragmentListener,
         NavigationView.OnNavigationItemSelectedListener {
-
-    private ShareActionProvider mShareActionProvider;
-    private Fragment mCurrentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +85,7 @@ public class SpotsListActivity extends AppCompatActivity implements
     }
 
     public void onNavItemFavSelected () {
-        FavouriteSpotsFragment newFavSpotsFragment = new FavouriteSpotsFragment(this);
+        FavouriteSpotsFragment newFavSpotsFragment = new FavouriteSpotsFragment();
         replaceFragment(newFavSpotsFragment);
     }
 
@@ -105,7 +101,6 @@ public class SpotsListActivity extends AppCompatActivity implements
             fragmentTransaction.addToBackStack(null);
         }
         fragmentTransaction.commit();
-        mCurrentFragment = fragment;
     }
 
     @Override
@@ -128,7 +123,7 @@ public class SpotsListActivity extends AppCompatActivity implements
 
     @Override
     public void onSpotClick(Spot spot) {
-        SpotDetailFragment fragmentDetail = SpotDetailFragment.newInstance(spot, this);
+        SpotDetailFragment fragmentDetail = SpotDetailFragment.newInstance(spot);
         replaceFragment(fragmentDetail);
     }
 
@@ -180,7 +175,7 @@ public class SpotsListActivity extends AppCompatActivity implements
 
     @Override
     public void onAddNewSpotClick() {
-        NewSpotFragment newSpotFragment = new NewSpotFragment(this);
+        NewSpotFragment newSpotFragment = new NewSpotFragment();
         replaceFragment(newSpotFragment);
     }
 
@@ -191,7 +186,7 @@ public class SpotsListActivity extends AppCompatActivity implements
     }
 
     private void showSpotsListFragment(boolean addToBackStack) {
-        SpotsListFragment fragmentList = new SpotsListFragment(this);
+        SpotsListFragment fragmentList = new SpotsListFragment();
         replaceFragment(fragmentList, addToBackStack);
     }
 

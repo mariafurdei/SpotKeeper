@@ -1,5 +1,6 @@
 package com.maryf.spotkeeper.fragments;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -37,8 +38,6 @@ public class SpotsListFragment extends Fragment implements
 
     private SpotsListAdapter spotsListAdapter;
 
-    public SpotsListFragment() {}
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(), SpotsContentProvider.CONTENT_URI,
@@ -64,8 +63,10 @@ public class SpotsListFragment extends Fragment implements
 
     private SpotsListFragmentListener listener;
 
-    public SpotsListFragment(SpotsListFragmentListener listener) {
-        this.listener = listener;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.listener = (SpotsListFragmentListener) context;
     }
 
     public void onCreate(@Nullable Bundle savedInstanceState) {

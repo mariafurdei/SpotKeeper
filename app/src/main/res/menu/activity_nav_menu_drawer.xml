@@ -9,7 +9,7 @@
         <item
             android:id="@+id/nav_favourites"
             android:icon="@mipmap/ic_fav_empty"
-            android:title="Favourite spots" />
+            android:title="Favorite spots" />
         <item
             android:id="@+id/nav_addnewspot"
             android:icon="@mipmap/ic_add_new_spot_btn"

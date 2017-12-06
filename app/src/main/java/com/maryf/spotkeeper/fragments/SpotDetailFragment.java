@@ -1,5 +1,6 @@
 package com.maryf.spotkeeper.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -56,12 +57,8 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
 
     public SpotDetailFragmentListener listener;
 
-    public SpotDetailFragment(SpotDetailFragmentListener listener) {
-        this.listener = listener;
-    }
-
-    public static SpotDetailFragment newInstance(Spot spot, SpotDetailFragmentListener spotsListActivity) {
-        SpotDetailFragment detailFragment = new SpotDetailFragment(spotsListActivity);
+    public static SpotDetailFragment newInstance(Spot spot) {
+        SpotDetailFragment detailFragment = new SpotDetailFragment();
 
         Bundle spotParams = new Bundle();
         spotParams.putSerializable("Spot", spot);
@@ -69,6 +66,12 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         detailFragment.setArguments(spotParams);
 
         return detailFragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.listener = (SpotDetailFragmentListener) context;
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

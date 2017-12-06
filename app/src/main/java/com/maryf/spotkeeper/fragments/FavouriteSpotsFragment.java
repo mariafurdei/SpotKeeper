@@ -16,15 +16,10 @@ import com.maryf.spotkeeper.contentproviders.SpotsContentProvider;
 
 public class FavouriteSpotsFragment extends SpotsListFragment {
 
-    public FavouriteSpotsFragment(SpotsListFragmentListener listener) {
-        super(listener);//!!read about
-    }
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] arg = {"1"};
         return new CursorLoader(getActivity(), SpotsContentProvider.CONTENT_URI,
                 CONTACTS_SUMMARY_PROJECTION, "favFlag=?", arg, null);
     }
-
 }
