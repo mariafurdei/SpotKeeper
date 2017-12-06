@@ -4,6 +4,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -33,6 +34,7 @@ public class SpotsListActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener {
 
     private ShareActionProvider mShareActionProvider;
+    private Fragment mCurrentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,14 +56,8 @@ public class SpotsListActivity extends AppCompatActivity implements
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        showSpotsListFragment();
+        showSpotsListFragment(false);
     }
-
-    @Override
-    public void onBackPressed() {
-        showSpotsListFragment();
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -93,12 +89,23 @@ public class SpotsListActivity extends AppCompatActivity implements
     }
 
     public void onNavItemFavSelected () {
+        FavouriteSpotsFragment newFavSpotsFragment = new FavouriteSpotsFragment(this);
+        replaceFragment(newFavSpotsFragment);
+    }
+
+    public void replaceFragment(Fragment fragment) {
+        replaceFragment(fragment, true);
+    }
+
+    public void replaceFragment(Fragment fragment, boolean addToBackStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        FavouriteSpotsFragment newFavSpotsFragment = new FavouriteSpotsFragment(this);
-        fragmentTransaction.replace(R.id.activity_spots_list_content, newFavSpotsFragment);
-        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.activity_spots_list_content, fragment);
+        if (addToBackStack) {
+            fragmentTransaction.addToBackStack(null);
+        }
         fragmentTransaction.commit();
+        mCurrentFragment = fragment;
     }
 
     @Override
@@ -107,7 +114,7 @@ public class SpotsListActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         if (id == R.id.nav_all_spots) {
-            showSpotsListFragment();
+            showSpotsListFragment(true);
         } else if (id == R.id.nav_favourites) {
             onNavItemFavSelected();
         } else if (id == R.id.nav_addnewspot) {
@@ -121,12 +128,8 @@ public class SpotsListActivity extends AppCompatActivity implements
 
     @Override
     public void onSpotClick(Spot spot) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         SpotDetailFragment fragmentDetail = SpotDetailFragment.newInstance(spot, this);
-        fragmentTransaction.replace(R.id.activity_spots_list_content, fragmentDetail);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+        replaceFragment(fragmentDetail);
     }
 
     public void onSpotLongClick(final Spot spot, View v) {
@@ -150,7 +153,8 @@ public class SpotsListActivity extends AppCompatActivity implements
 
     @Override
     public void onCloseDetailsClick() {
-        showSpotsListFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.popBackStack();
     }
 
     @Override
@@ -170,36 +174,31 @@ public class SpotsListActivity extends AppCompatActivity implements
                 values,
                 null,
                 null);
-        showSpotsListFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.popBackStack();
    }
 
     @Override
     public void onAddNewSpotClick() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         NewSpotFragment newSpotFragment = new NewSpotFragment(this);
-        fragmentTransaction.replace(R.id.activity_spots_list_content, newSpotFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+        replaceFragment(newSpotFragment);
     }
 
     @Override
     public void onCancelAddNewSpotClick() {
-        showSpotsListFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.popBackStack();
     }
 
-    private void showSpotsListFragment() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+    private void showSpotsListFragment(boolean addToBackStack) {
         SpotsListFragment fragmentList = new SpotsListFragment(this);
-        fragmentTransaction.replace(R.id.activity_spots_list_content, fragmentList);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+        replaceFragment(fragmentList, addToBackStack);
     }
 
     @Override
     public void onSaveNewSpotClick(Spot spot) {
-        showSpotsListFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.popBackStack();
         ContentValues values = new ContentValues();
         values.put(SpotsContentProvider.COLUMN_SPOT_NAME, spot.getName());
         values.put(SpotsContentProvider.COLUMN_SPOT_ADDRESS, spot.getAddress());
