@@ -69,7 +69,12 @@
             android:layout_alignParentLeft="true"
             android:layout_weight=".50"
             android:id="@+id/CancelAddNewSpotBtn"
-            android:background="@color/colorAccent" />
+            android:background="@color/colorButton" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#FFFFFF" />
 
         <Button
             android:text="SAVE"
@@ -79,7 +84,7 @@
             android:layout_alignParentBottom="true"
             android:layout_weight=".50"
             android:id="@+id/SaveNewSpotBtn"
-            android:background="@android:color/holo_green_light" />
+            android:background="@color/colorButton" />
 
     </LinearLayout>
 
