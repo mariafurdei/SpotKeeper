@@ -3,13 +3,17 @@ package com.maryf.spotkeeper.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.maryf.spotkeeper.R;
+import com.maryf.spotkeeper.SpotsListActivity;
 import com.maryf.spotkeeper.model.Spot;
 
 /**
@@ -55,6 +59,13 @@ public class NewSpotFragment extends Fragment {
             }
         });
 
+        Button useCurLocBtn = (Button) rootView.findViewById(R.id.btnUseCurrentLocation);
+        useCurLocBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //add getting current location
+            }
+        });
         return rootView;
     }
 }

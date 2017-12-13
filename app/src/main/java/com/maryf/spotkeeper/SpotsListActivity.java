@@ -57,7 +57,6 @@ public class SpotsListActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.nav_menu, menu);
 
         MenuItem item = menu.findItem(R.id.menu_item_share);
@@ -80,7 +79,6 @@ public class SpotsListActivity extends AppCompatActivity implements
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, "This spot" ));
         }
-
         return super.onOptionsItemSelected(item);
     }
 
