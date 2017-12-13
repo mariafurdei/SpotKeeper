@@ -5,20 +5,6 @@
     android:layout_height="match_parent"
     android:id="@+id/spot_list_item">
 
-    <Button
-        android:text="Use current location"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:drawableLeft="@mipmap/ic_use_cur_loc"
-        android:layout_marginTop="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:id="@+id/btnUseCurrentLocation"
-        android:background="@color/colorButton" />
-
-
     <TextView
         android:text="Spot name: "
         android:textStyle="bold"

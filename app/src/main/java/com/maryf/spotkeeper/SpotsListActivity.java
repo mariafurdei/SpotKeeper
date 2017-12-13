@@ -21,7 +21,6 @@ import android.widget.PopupMenu;
 
 import com.maryf.spotkeeper.contentproviders.SpotsContentProvider;
 import com.maryf.spotkeeper.fragments.FavouriteSpotsFragment;
-import com.maryf.spotkeeper.fragments.NewSpotFragment;
 import com.maryf.spotkeeper.fragments.SpotDetailFragment;
 import com.maryf.spotkeeper.fragments.SpotsListFragment;
 import com.maryf.spotkeeper.model.Spot;
@@ -29,7 +28,6 @@ import com.maryf.spotkeeper.model.Spot;
 public class SpotsListActivity extends AppCompatActivity implements
         SpotsListFragment.SpotsListFragmentListener,
         SpotDetailFragment.SpotDetailFragmentListener,
-        NewSpotFragment.NewSpotFragmentListener,
         NavigationView.OnNavigationItemSelectedListener {
 
     @Override
@@ -125,13 +123,14 @@ public class SpotsListActivity extends AppCompatActivity implements
         replaceFragment(fragmentDetail);
     }
 
-    public void onSpotLongClick(final Spot spot, View v) {
-        //Creating the instance of PopupMenu
-        PopupMenu popup = new PopupMenu(SpotsListActivity.this, v);
-        //Inflating the Popup using xml file
-        popup.getMenuInflater().inflate(R.menu.spots_list_popup_menu, popup.getMenu());
+    @Override
+    public void onAddNewSpotClick() {
+        onSpotClick(null);
+    }
 
-        //registering popup with OnMenuItemClickListener
+    public void onSpotLongClick(final Spot spot, View v) {
+        PopupMenu popup = new PopupMenu(SpotsListActivity.this, v);
+        popup.getMenuInflater().inflate(R.menu.spots_list_popup_menu, popup.getMenu());
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
                 getContentResolver().delete(
@@ -151,7 +150,8 @@ public class SpotsListActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onUpdateSpot(final Spot spot) {
+    public void onSaveSpot(final Spot spot) {
+
         ContentValues values = new ContentValues();
         ImageButton favFlagBtn = (ImageButton) findViewById(R.id.add_to_fav_but_det);
         values.put(SpotsContentProvider.COLUMN_SPOT_NAME, spot.getName());
@@ -162,23 +162,17 @@ public class SpotsListActivity extends AppCompatActivity implements
             values.put(SpotsContentProvider.COLUMN_FAV_FL, 1);
         }
 
-        getContentResolver().update(
-                ContentUris.withAppendedId(SpotsContentProvider.CONTENT_URI, spot.getId()),
-                values,
-                null,
-                null);
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.popBackStack();
-   }
-
-    @Override
-    public void onAddNewSpotClick() {
-        NewSpotFragment newSpotFragment = new NewSpotFragment();
-        replaceFragment(newSpotFragment);
-    }
-
-    @Override
-    public void onCancelAddNewSpotClick() {
+        if (spot.getId() != null){
+            getContentResolver().update(
+                    ContentUris.withAppendedId(SpotsContentProvider.CONTENT_URI, spot.getId()),
+                    values,
+                    null,
+                    null);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.popBackStack();
+        } else {
+            getContentResolver().insert(SpotsContentProvider.CONTENT_URI, values);
+        }
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.popBackStack();
     }
@@ -186,16 +180,6 @@ public class SpotsListActivity extends AppCompatActivity implements
     private void showSpotsListFragment(boolean addToBackStack) {
         SpotsListFragment fragmentList = new SpotsListFragment();
         replaceFragment(fragmentList, addToBackStack);
-    }
-
-    @Override
-    public void onSaveNewSpotClick(Spot spot) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.popBackStack();
-        ContentValues values = new ContentValues();
-        values.put(SpotsContentProvider.COLUMN_SPOT_NAME, spot.getName());
-        values.put(SpotsContentProvider.COLUMN_SPOT_ADDRESS, spot.getAddress());
-        getContentResolver().insert(SpotsContentProvider.CONTENT_URI, values);
     }
 
     public void onFavButClick(Spot spot) {

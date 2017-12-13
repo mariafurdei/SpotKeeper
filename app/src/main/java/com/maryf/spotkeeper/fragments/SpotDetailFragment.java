@@ -50,7 +50,7 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
     public interface SpotDetailFragmentListener {
         void onCloseDetailsClick();
 
-        void onUpdateSpot(Spot spot);
+        void onSaveSpot(Spot spot);
 
         void onFavDetBtnClick(Spot spot);
     }
@@ -94,13 +94,17 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         ImageButton favFlag = (ImageButton) rootView.findViewById(R.id.add_to_fav_but_det);
 
         final Spot spot = (Spot) bundle.getSerializable("Spot");
-        nameView.setText(spot.getName());
-        addressView.setText(spot.getAddress());
-        if (spot.getFavFlag() == 1) {
-            favFlag.setImageResource(R.mipmap.ic_fav_but_pressed);
-            favFlag.setTag(1);
+        if (spot != null) {
+            nameView.setText(spot.getName());
+            addressView.setText(spot.getAddress());
+            if (spot.getFavFlag() == 1) {
+                favFlag.setImageResource(R.mipmap.ic_fav_but_pressed);
+                favFlag.setTag(1);
+            } else {
+                favFlag.setImageResource(R.mipmap.ic_fav_but_unpressed);
+                favFlag.setTag(0);
+            }
         } else {
-            favFlag.setImageResource(R.mipmap.ic_fav_but_unpressed);
             favFlag.setTag(0);
         }
 
@@ -119,8 +123,13 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
                 EditText spotAddress = (EditText) rootView.findViewById(R.id.spot_address_detail);
                 Bundle bundle = getArguments();
                 Spot originalSpot = (Spot) bundle.getSerializable("Spot");
-                Spot spot = new Spot(originalSpot.getId(), spotName.getText().toString(), spotAddress.getText().toString(), 0);
-                listener.onUpdateSpot(spot);
+                Spot spotDet;
+                if (spot != null) {
+                    spotDet = new Spot(originalSpot.getId(), spotName.getText().toString(), spotAddress.getText().toString(), 0);
+                } else {
+                    spotDet = new Spot(null, spotName.getText().toString(), spotAddress.getText().toString(), 0);
+                }
+                listener.onSaveSpot(spotDet);
             }
         });
 
@@ -172,7 +181,12 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
 
         Bundle bundle = getArguments();
         final Spot spot = (Spot) bundle.getSerializable("Spot");
-        String spotAddress = spot.getAddress();
+        String spotAddress;
+        if (spot != null) {
+            spotAddress = spot.getAddress();
+        } else {
+            spotAddress = "Sunnyvale, CA";
+        }
 
         try {
             List<Address> addresses = geocoder.getFromLocationName(spotAddress, 1);
