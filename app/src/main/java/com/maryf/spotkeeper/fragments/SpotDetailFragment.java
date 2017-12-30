@@ -1,13 +1,25 @@
 package com.maryf.spotkeeper.fragments;
 
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.Service;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
+import android.location.Criteria;
 import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,9 +44,11 @@ import com.google.android.gms.maps.SupportStreetViewPanoramaFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.maryf.spotkeeper.R;
+import com.maryf.spotkeeper.SpotsListActivity;
 import com.maryf.spotkeeper.model.Spot;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -42,10 +56,230 @@ import java.util.List;
  * Created by maryf on 4/10/2017.
  */
 
-public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
+public class SpotDetailFragment extends Fragment implements OnMapReadyCallback,
+        LocationListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationChangeListener {
 
     private GoogleMap mMap;
     private MapView mapView;
+
+    final String TAG = "GPS";
+    private final static int ALL_PERMISSIONS_RESULT = 101;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 1 * 1;
+    ArrayList<String> permissions = new ArrayList<>();
+    ArrayList<String> permissionsToRequest;
+    ArrayList<String> permissionsRejected = new ArrayList<>();
+    boolean isGPS = false;
+    boolean isNetwork = false;
+    boolean canGetLocation = true;
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d(TAG, "onLocationChanged");
+        updateUI(location);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        getLocation();
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+
+    ////****
+    private void getLocation() {
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Service.LOCATION_SERVICE);
+        Location loc = null;
+        try {
+            if (canGetLocation) {
+                Log.d(TAG, "Can get location");
+                if (isGPS) {
+                    // from GPS
+                    Log.d(TAG, "GPS on");
+                    locationManager.requestLocationUpdates(
+                            LocationManager.GPS_PROVIDER,
+                            MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                    if (locationManager != null) {
+                        loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        if (loc != null)
+                            updateUI(loc);
+                    }
+                } else if (isNetwork) {
+                    // from Network Provider
+                    Log.d(TAG, "NETWORK_PROVIDER on");
+                    locationManager.requestLocationUpdates(
+                            LocationManager.NETWORK_PROVIDER,
+                            MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                    if (locationManager != null) {
+                        loc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        if (loc != null)
+                            updateUI(loc);
+                    }
+                } else {
+                    loc = null;
+                    loc.setLatitude(0);
+                    loc.setLongitude(0);
+                    updateUI(loc);
+                }
+            } else {
+                Log.d(TAG, "Can't get location");
+            }
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getLastLocation() {
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Service.LOCATION_SERVICE);
+        try {
+            Criteria criteria = new Criteria();
+            String provider = locationManager.getBestProvider(criteria, false);
+            Location location = locationManager.getLastKnownLocation(provider);
+            Log.d(TAG, provider);
+            Log.d(TAG, location == null ? "NO LastLocation" : location.toString());
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private ArrayList findUnAskedPermissions(ArrayList<String> wanted) {
+        ArrayList result = new ArrayList();
+
+        for (String perm : wanted) {
+            if (!hasPermission(perm)) {
+                result.add(perm);
+            }
+        }
+
+        return result;
+    }
+
+    private boolean hasPermission(String permission) {
+        if (canAskPermission()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                return (getActivity().checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED);
+            }
+        }
+        return true;
+    }
+
+    private boolean canAskPermission() {
+        return (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case ALL_PERMISSIONS_RESULT:
+                Log.d(TAG, "onRequestPermissionsResult");
+                for (String perms : permissionsToRequest) {
+                    if (!hasPermission(perms)) {
+                        permissionsRejected.add(perms);
+                    }
+                }
+
+                if (permissionsRejected.size() > 0) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (shouldShowRequestPermissionRationale(permissionsRejected.get(0))) {
+                            showMessageOKCancel("These permissions are mandatory for the application. Please allow access.",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                                requestPermissions(permissionsRejected.toArray(
+                                                        new String[permissionsRejected.size()]), ALL_PERMISSIONS_RESULT);
+                                            }
+                                        }
+                                    });
+                            return;
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "No rejected permissions.");
+                    canGetLocation = true;
+                    getLocation();
+                }
+                break;
+        }
+    }
+
+    public void showSettingsAlert() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        alertDialog.setTitle("GPS is not Enabled!");
+        alertDialog.setMessage("Do you want to turn on GPS?");
+        alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        });
+
+        alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        alertDialog.show();
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(getActivity())
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
+
+    private void updateUI(Location loc) {
+        Log.d(TAG, "updateUI");
+        View rootView = getView();
+        EditText spotAddress = (EditText) rootView.findViewById(R.id.spot_address_detail);
+        if (loc != null) {
+            Geocoder geocoder = new Geocoder(getActivity());
+            try {
+                List<Address> addresses = geocoder.getFromLocation(
+                        mMap.getCameraPosition().target.latitude,
+                        mMap.getCameraPosition().target.longitude, 1);
+
+                String address = (addresses != null && addresses.size() > 0)
+                        ? addresses.get(0).getAddressLine(0)
+                        : "Unknown";
+
+                spotAddress.setText(address);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }} else {
+            spotAddress.setText("");
+        }
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        return false;
+    }
+
+    @Override
+    public void onMyLocationChange(Location location) {
+        System.out.println("");
+    }
+    ////****
 
     public interface SpotDetailFragmentListener {
         void onCloseDetailsClick();
@@ -133,6 +367,39 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
+        Button btnUseCurLoc = (Button) rootView.findViewById(R.id.btnUseCurrentLocation);
+        btnUseCurLoc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ///***
+                LocationManager locationManager = (LocationManager) getActivity().getSystemService(Service.LOCATION_SERVICE);
+                isGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                isNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+                permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+                permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+                permissionsToRequest = findUnAskedPermissions(permissions);
+
+                if (!isGPS && !isNetwork) {
+                    //Log.d(TAG, "Connection off");
+                    showSettingsAlert();
+                    getLastLocation();
+                } else {
+                    Log.d(TAG, "Connection on");
+                    //check permissions
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (permissionsToRequest.size() > 0) {
+                            requestPermissions(permissionsToRequest.toArray(new String[permissionsToRequest.size()]), ALL_PERMISSIONS_RESULT);
+                            Log.d(TAG, "Permission requests");
+                            canGetLocation = false;
+                        }
+                    }
+                    getLocation();
+                }
+                ///***
+            }
+        });
+
         setHasOptionsMenu(true);
 
       return rootView;
@@ -176,6 +443,9 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setMyLocationEnabled(true);
+        mMap.setOnMyLocationButtonClickListener(this);
+        mMap.setOnMyLocationChangeListener(this);
 
         Geocoder geocoder = new Geocoder(getActivity());
 
