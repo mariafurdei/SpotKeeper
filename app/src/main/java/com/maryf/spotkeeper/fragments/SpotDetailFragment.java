@@ -244,6 +244,9 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        // Turn on the My Location layer and the related control on the map.
+        updateLocationUI();
+
         Geocoder geocoder = new Geocoder(getActivity());
 
         Bundle bundle = getArguments();
@@ -251,94 +254,95 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         String spotAddress;
         if (spot != null) {
             spotAddress = spot.getAddress();
-        } else {
-            spotAddress = "Sunnyvale, CA";
-        }
+            updateLocationUI();
 
-        try {
-            List<Address> addresses = geocoder.getFromLocationName(spotAddress, 1);
-            if (addresses.size() > 0) {
-                final double latitude = addresses.get(0).getLatitude();
-                final double longitude = addresses.get(0).getLongitude();
+            try {
+                List<Address> addresses = geocoder.getFromLocationName(spotAddress, 1);
+                if (addresses.size() > 0) {
+                    final double latitude = addresses.get(0).getLatitude();
+                    final double longitude = addresses.get(0).getLongitude();
 
-                LatLng spotOnMap = new LatLng(latitude, longitude);
-                mMap.addMarker(new MarkerOptions().position(spotOnMap).title("Marker in" + spotAddress));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(spotOnMap,15));
-                mMap.animateCamera(CameraUpdateFactory.zoomIn());
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+                    LatLng spotOnMap = new LatLng(latitude, longitude);
+                    mMap.addMarker(new MarkerOptions().position(spotOnMap).title("Marker in" + spotAddress));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(spotOnMap,15));
+                    mMap.animateCamera(CameraUpdateFactory.zoomIn());
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
 
-                FragmentManager fm = getChildFragmentManager();
-                SupportStreetViewPanoramaFragment sVpFragment = (SupportStreetViewPanoramaFragment) fm.findFragmentByTag("sVpFragment");
-                if (sVpFragment == null) {
-                    sVpFragment = new SupportStreetViewPanoramaFragment();
-                    android.support.v4.app.FragmentTransaction ft = fm.beginTransaction();
-                    ft.add(R.id.streetViewPanoramaFragmentContainer, sVpFragment, "sVpFragment");
-                    ft.commit();
-                    fm.executePendingTransactions();
+                    FragmentManager fm = getChildFragmentManager();
+                    SupportStreetViewPanoramaFragment sVpFragment = (SupportStreetViewPanoramaFragment) fm.findFragmentByTag("sVpFragment");
+                    if (sVpFragment == null) {
+                        sVpFragment = new SupportStreetViewPanoramaFragment();
+                        android.support.v4.app.FragmentTransaction ft = fm.beginTransaction();
+                        ft.add(R.id.streetViewPanoramaFragmentContainer, sVpFragment, "sVpFragment");
+                        ft.commit();
+                        fm.executePendingTransactions();
+                    }
+                    sVpFragment.getStreetViewPanoramaAsync(new OnStreetViewPanoramaReadyCallback() {
+                        @Override
+                        public void onStreetViewPanoramaReady(StreetViewPanorama streetViewPanorama) {
+                            StreetViewPanorama mPanorama = streetViewPanorama;
+                            mPanorama.setPosition(new LatLng(latitude, longitude));
+                        }
+                    });
                 }
-                sVpFragment.getStreetViewPanoramaAsync(new OnStreetViewPanoramaReadyCallback() {
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+                mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
-                    public void onStreetViewPanoramaReady(StreetViewPanorama streetViewPanorama) {
-                        StreetViewPanorama mPanorama = streetViewPanorama;
-                        mPanorama.setPosition(new LatLng(latitude, longitude));
+                    public void onMapClick(LatLng latLng) {
+                        Log.d("Map", "Map clicked");
+                        mMap.clear();
+                        mMap.addMarker(new MarkerOptions().position(latLng).title("New spot"));
+
+                        Geocoder geocoder = new Geocoder(getActivity());
+                        try {
+                            List<Address> addresses = geocoder.getFromLocation(
+                                    mMap.getCameraPosition().target.latitude,
+                                    mMap.getCameraPosition().target.longitude, 1);
+
+                            String address = (addresses != null && addresses.size() > 0)
+                                    ? addresses.get(0).getAddressLine(0)
+                                    : "Unknown";
+
+                            View rootView = getView();
+                            TextView addressView = (TextView) rootView.findViewById(R.id.spot_address_detail);
+                            addressView.setText(address);
+
+                            FragmentManager fm = getChildFragmentManager();
+                            SupportStreetViewPanoramaFragment sVpFragment = (SupportStreetViewPanoramaFragment) fm.findFragmentByTag("sVpFragment");
+                            if (sVpFragment == null) {
+                                sVpFragment = new SupportStreetViewPanoramaFragment();
+                                android.support.v4.app.FragmentTransaction ft = fm.beginTransaction();
+                                ft.add(R.id.streetViewPanoramaFragmentContainer, sVpFragment, "sVpFragment");
+                                ft.commit();
+                                fm.executePendingTransactions();
+                            }
+                            sVpFragment.getStreetViewPanoramaAsync(new OnStreetViewPanoramaReadyCallback() {
+                                @Override
+                                public void onStreetViewPanoramaReady(StreetViewPanorama streetViewPanorama) {
+                                    StreetViewPanorama mPanorama = streetViewPanorama;
+                                    mPanorama.setPosition(new LatLng(
+                                            mMap.getCameraPosition().target.latitude,
+                                            mMap.getCameraPosition().target.longitude));
+                                }
+                            });
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-            mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-                @Override
-                public void onMapClick(LatLng latLng) {
-                    Log.d("Map", "Map clicked");
-                    mMap.clear();
-                    mMap.addMarker(new MarkerOptions().position(latLng).title("New spot"));
-
-                    Geocoder geocoder = new Geocoder(getActivity());
-                    try {
-                        List<Address> addresses = geocoder.getFromLocation(
-                                mMap.getCameraPosition().target.latitude,
-                                mMap.getCameraPosition().target.longitude, 1);
-
-                        String address = (addresses != null && addresses.size() > 0)
-                                ? addresses.get(0).getAddressLine(0)
-                                : "Unknown";
-
-                        View rootView = getView();
-                        TextView addressView = (TextView) rootView.findViewById(R.id.spot_address_detail);
-                        addressView.setText(address);
-
-                        FragmentManager fm = getChildFragmentManager();
-                        SupportStreetViewPanoramaFragment sVpFragment = (SupportStreetViewPanoramaFragment) fm.findFragmentByTag("sVpFragment");
-                        if (sVpFragment == null) {
-                            sVpFragment = new SupportStreetViewPanoramaFragment();
-                            android.support.v4.app.FragmentTransaction ft = fm.beginTransaction();
-                            ft.add(R.id.streetViewPanoramaFragmentContainer, sVpFragment, "sVpFragment");
-                            ft.commit();
-                            fm.executePendingTransactions();
-                        }
-                        sVpFragment.getStreetViewPanoramaAsync(new OnStreetViewPanoramaReadyCallback() {
-                            @Override
-                            public void onStreetViewPanoramaReady(StreetViewPanorama streetViewPanorama) {
-                                StreetViewPanorama mPanorama = streetViewPanorama;
-                                mPanorama.setPosition(new LatLng(
-                                        mMap.getCameraPosition().target.latitude,
-                                        mMap.getCameraPosition().target.longitude));
-                            }
-                        });
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+        } else {
 
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
+        }
     }
 
     private void updateLocationUI() {
