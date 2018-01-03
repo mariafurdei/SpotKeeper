@@ -12,6 +12,8 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -123,7 +125,7 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         Bundle bundle = getArguments();
 
         TextView nameView = (TextView) rootView.findViewById(R.id.spot_name_detail);
-        TextView addressView = (TextView) rootView.findViewById(R.id.spot_address_detail);
+        final TextView addressView = (TextView) rootView.findViewById(R.id.spot_address_detail);
         ImageButton favFlag = (ImageButton) rootView.findViewById(R.id.add_to_fav_but_det);
 
         final Spot spot = (Spot) bundle.getSerializable("Spot");
@@ -163,6 +165,24 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
                     spotDet = new Spot(null, spotName.getText().toString(), spotAddress.getText().toString(), 0);
                 }
                 listener.onSaveSpot(spotDet);
+            }
+        });
+
+        addressView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!addressView.getText().toString().matches("")) {
+                    addressToPosition(addressView.getText().toString());}
             }
         });
 
@@ -247,57 +267,27 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
 
-        Geocoder geocoder = new Geocoder(getActivity());
-
         Bundle bundle = getArguments();
         final Spot spot = (Spot) bundle.getSerializable("Spot");
         String spotAddress;
+
         if (spot != null) {
             spotAddress = spot.getAddress();
+
             updateLocationUI();
 
-            try {
-                List<Address> addresses = geocoder.getFromLocationName(spotAddress, 1);
-                if (addresses.size() > 0) {
-                    final double latitude = addresses.get(0).getLatitude();
-                    final double longitude = addresses.get(0).getLongitude();
+            addressToPosition(spotAddress);
 
-                    LatLng spotOnMap = new LatLng(latitude, longitude);
-                    mMap.addMarker(new MarkerOptions().position(spotOnMap).title("Marker in" + spotAddress));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(spotOnMap,15));
-                    mMap.animateCamera(CameraUpdateFactory.zoomIn());
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
-
-                    setPanoramaStreetView(latitude, longitude);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-                mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(LatLng latLng) {
                         Log.d("Map", "Map clicked");
                         mMap.clear();
                         mMap.addMarker(new MarkerOptions().position(latLng).title("New spot"));
 
-                        Geocoder geocoder = new Geocoder(getActivity());
                         try {
-                            List<Address> addresses = geocoder.getFromLocation(
-                                    mMap.getCameraPosition().target.latitude,
-                                    mMap.getCameraPosition().target.longitude, 1);
-
-                            String address = (addresses != null && addresses.size() > 0)
-                                    ? addresses.get(0).getAddressLine(0)
-                                    : "Unknown";
-
-                            View rootView = getView();
-                            TextView addressView = (TextView) rootView.findViewById(R.id.spot_address_detail);
-                            addressView.setText(address);
-
-                            setPanoramaStreetView(mMap.getCameraPosition().target.latitude,
-                                                  mMap.getCameraPosition().target.longitude);
-
+                            positionToAddress(mMap.getCameraPosition().target.latitude,
+                                                     mMap.getCameraPosition().target.longitude);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -312,6 +302,59 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
         }
+
+        //mMap.isMyLocationEnabled();
+        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+            @Override
+            public boolean onMyLocationButtonClick() {
+                try {
+                    positionToAddress(mMap.getCameraPosition().target.latitude, mMap.getCameraPosition().target.longitude);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return false;
+            }
+        });
+    }
+
+    private void addressToPosition(String spotAddress){
+        Geocoder geocoder = new Geocoder(getActivity());
+        List<Address> addresses = null;
+        try {
+            addresses = geocoder.getFromLocationName(spotAddress, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (addresses.size() > 0) {
+            final double latitude = addresses.get(0).getLatitude();
+            final double longitude = addresses.get(0).getLongitude();
+
+            LatLng spotOnMap = new LatLng(latitude, longitude);
+            mMap.addMarker(new MarkerOptions().position(spotOnMap).title("Marker in" + spotAddress));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(spotOnMap,15));
+            mMap.animateCamera(CameraUpdateFactory.zoomIn());
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+
+            setPanoramaStreetView(latitude, longitude);
+        }
+    }
+
+    private void positionToAddress(double latitude, double longitude) throws IOException {
+        Geocoder geocoder = new Geocoder(getActivity());
+        List<Address> addresses = geocoder.getFromLocation(
+                mMap.getCameraPosition().target.latitude,
+                mMap.getCameraPosition().target.longitude, 1);
+        String address = (addresses != null && addresses.size() > 0)
+                ? addresses.get(0).getAddressLine(0)
+                : "Unknown";
+        View rootView = getView();
+        TextView addressView = (TextView) rootView.findViewById(R.id.spot_address_detail);
+        TextView nameView = (TextView) rootView.findViewById(R.id.spot_name_detail);
+        addressView.setText(address);
+        nameView.setText("");
+
+        setPanoramaStreetView(mMap.getCameraPosition().target.latitude,
+                mMap.getCameraPosition().target.longitude);
     }
 
     private void setPanoramaStreetView(final double latitude, final double longitude) {
@@ -357,36 +400,36 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
      * Get the best and most recent location of the device, which may be null in rare
      * cases when a location is not available.
      */
-        try {
-            if (mLocationPermissionGranted) {
-                Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
-                locationResult.addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful()) {
-                            // Set the map's camera position to the current location of the device.
-                            mLastKnownLocation = task.getResult();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(mLastKnownLocation.getLatitude(),
-                                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
 
-                            LatLng spotOnMap = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-                            mMap.addMarker(new MarkerOptions().position(spotOnMap).title("Marker in" + mDefaultLocation));
-                            setPanoramaStreetView(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-                        } else {
-                            Log.d(TAG, "Current location is null. Using defaults.");
-                            Log.e(TAG, "Exception: %s", task.getException());
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
-                            mMap.addMarker(new MarkerOptions().position(mDefaultLocation).title("Marker in" + mDefaultLocation));
-                            mMap.getUiSettings().setMyLocationButtonEnabled(false);
-                            setPanoramaStreetView(mDefaultLocation.latitude, mDefaultLocation.longitude);
-                        }
+    try {
+        if (mLocationPermissionGranted) {
+            Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
+            locationResult.addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
+                @Override
+                public void onComplete(@NonNull Task<Location> task) {
+                    if (task.isSuccessful()) {
+                        // Set the map's camera position to the current location of the device.
+                        mLastKnownLocation = task.getResult();
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                new LatLng(mLastKnownLocation.getLatitude(),
+                                        mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+
+                        LatLng spotOnMap = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+                        mMap.addMarker(new MarkerOptions().position(spotOnMap).title("Marker in" + mDefaultLocation));
+                        setPanoramaStreetView(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+                    } else {
+                        Log.d(TAG, "Current location is null. Using defaults.");
+                        Log.e(TAG, "Exception: %s", task.getException());
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+                        mMap.addMarker(new MarkerOptions().position(mDefaultLocation).title("Marker in" + mDefaultLocation));
+                        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+                        setPanoramaStreetView(mDefaultLocation.latitude, mDefaultLocation.longitude);
                     }
-                });
-            }
-        } catch(SecurityException e)  {
-            Log.e("Exception: %s", e.getMessage());
+                }
+            });
         }
+    } catch(SecurityException e)  {
+        Log.e("Exception: %s", e.getMessage());
     }
-
+    }
 }
