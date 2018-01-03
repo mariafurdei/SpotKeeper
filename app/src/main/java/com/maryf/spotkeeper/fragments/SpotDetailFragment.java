@@ -284,10 +284,9 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
                         Log.d("Map", "Map clicked");
                         mMap.clear();
                         mMap.addMarker(new MarkerOptions().position(latLng).title("New spot"));
-
+                        //***
                         try {
-                            positionToAddress(mMap.getCameraPosition().target.latitude,
-                                                     mMap.getCameraPosition().target.longitude);
+                            positionToAddress(latLng.latitude, latLng.longitude);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -296,23 +295,24 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
 
         } else {
 
-        // Turn on the My Location layer and the related control on the map.
-        updateLocationUI();
+            // Turn on the My Location layer and the related control on the map.
+            updateLocationUI();
 
-        // Get the current location of the device and set the position of the map.
-        getDeviceLocation();
+            // Get the current location of the device and set the position of the map.
+            getDeviceLocation();
         }
 
         //mMap.isMyLocationEnabled();
         mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
             @Override
             public boolean onMyLocationButtonClick() {
-                try {
-                    positionToAddress(mMap.getCameraPosition().target.latitude, mMap.getCameraPosition().target.longitude);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return false;
+//                try {
+//                    positionToAddress(mMap.getCameraPosition().target.latitude, mMap.getCameraPosition().target.longitude);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+                getDeviceLocation();
+                return true;
             }
         });
     }
@@ -339,7 +339,7 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void positionToAddress(double latitude, double longitude) throws IOException {
+    private String positionToAddress(double latitude, double longitude) throws IOException {
         Geocoder geocoder = new Geocoder(getActivity());
         List<Address> addresses = geocoder.getFromLocation(
                 mMap.getCameraPosition().target.latitude,
@@ -355,6 +355,8 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
 
         setPanoramaStreetView(mMap.getCameraPosition().target.latitude,
                 mMap.getCameraPosition().target.longitude);
+
+        return address;
     }
 
     private void setPanoramaStreetView(final double latitude, final double longitude) {
@@ -396,40 +398,52 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void getDeviceLocation() {
-    /*
-     * Get the best and most recent location of the device, which may be null in rare
-     * cases when a location is not available.
-     */
+        /*
+         * Get the best and most recent location of the device, which may be null in rare
+         * cases when a location is not available.
+         */
 
-    try {
-        if (mLocationPermissionGranted) {
-            Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
-            locationResult.addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
-                @Override
-                public void onComplete(@NonNull Task<Location> task) {
-                    if (task.isSuccessful()) {
-                        // Set the map's camera position to the current location of the device.
-                        mLastKnownLocation = task.getResult();
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                new LatLng(mLastKnownLocation.getLatitude(),
-                                        mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+        try {
+            if (mLocationPermissionGranted) {
+                Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
+                locationResult.addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful()) {
+                            // Set the map's camera position to the current location of the device.
+                            mLastKnownLocation = task.getResult();
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                    new LatLng(mLastKnownLocation.getLatitude(),
+                                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
 
-                        LatLng spotOnMap = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(spotOnMap).title("Marker in" + mDefaultLocation));
-                        setPanoramaStreetView(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-                    } else {
-                        Log.d(TAG, "Current location is null. Using defaults.");
-                        Log.e(TAG, "Exception: %s", task.getException());
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
-                        mMap.addMarker(new MarkerOptions().position(mDefaultLocation).title("Marker in" + mDefaultLocation));
-                        mMap.getUiSettings().setMyLocationButtonEnabled(false);
-                        setPanoramaStreetView(mDefaultLocation.latitude, mDefaultLocation.longitude);
+                            LatLng spotOnMap = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+                            mMap.addMarker(new MarkerOptions().position(spotOnMap).title("Marker in" + mLastKnownLocation));
+                            setPanoramaStreetView(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+
+                            try {
+                                positionToAddress(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        } else {
+                            Log.d(TAG, "Current location is null. Using defaults.");
+                            Log.e(TAG, "Exception: %s", task.getException());
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+                            mMap.addMarker(new MarkerOptions().position(mDefaultLocation).title("Marker in" + mDefaultLocation));
+                            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+                            setPanoramaStreetView(mDefaultLocation.latitude, mDefaultLocation.longitude);
+                            try {
+                                positionToAddress(mDefaultLocation.latitude, mDefaultLocation.longitude);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
-                }
-            });
+                });
+            }
+        } catch(SecurityException e)  {
+            Log.e("Exception: %s", e.getMessage());
         }
-    } catch(SecurityException e)  {
-        Log.e("Exception: %s", e.getMessage());
-    }
     }
 }
