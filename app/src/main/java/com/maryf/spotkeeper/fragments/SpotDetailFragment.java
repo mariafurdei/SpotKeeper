@@ -277,22 +277,6 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
             updateLocationUI();
 
             addressToPosition(spotAddress);
-
-            mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-                    @Override
-                    public void onMapClick(LatLng latLng) {
-                        Log.d("Map", "Map clicked");
-                        mMap.clear();
-                        mMap.addMarker(new MarkerOptions().position(latLng).title("New spot"));
-                        //***
-                        try {
-                            positionToAddress(latLng.latitude, latLng.longitude);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-
         } else {
 
             // Turn on the My Location layer and the related control on the map.
@@ -302,15 +286,20 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
             getDeviceLocation();
         }
 
-        //mMap.isMyLocationEnabled();
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                try {
+                    addNewMarker(latLng, positionToAddress(latLng.latitude, latLng.longitude));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
             @Override
             public boolean onMyLocationButtonClick() {
-//                try {
-//                    positionToAddress(mMap.getCameraPosition().target.latitude, mMap.getCameraPosition().target.longitude);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
                 getDeviceLocation();
                 return true;
             }
@@ -330,20 +319,14 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
             final double longitude = addresses.get(0).getLongitude();
 
             LatLng spotOnMap = new LatLng(latitude, longitude);
-            mMap.addMarker(new MarkerOptions().position(spotOnMap).title("Marker in" + spotAddress));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(spotOnMap,15));
-            mMap.animateCamera(CameraUpdateFactory.zoomIn());
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
-
+            addNewMarker(spotOnMap, spotAddress);
             setPanoramaStreetView(latitude, longitude);
         }
     }
 
     private String positionToAddress(double latitude, double longitude) throws IOException {
         Geocoder geocoder = new Geocoder(getActivity());
-        List<Address> addresses = geocoder.getFromLocation(
-                mMap.getCameraPosition().target.latitude,
-                mMap.getCameraPosition().target.longitude, 1);
+        List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
         String address = (addresses != null && addresses.size() > 0)
                 ? addresses.get(0).getAddressLine(0)
                 : "Unknown";
@@ -352,9 +335,7 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         TextView nameView = (TextView) rootView.findViewById(R.id.spot_name_detail);
         addressView.setText(address);
         nameView.setText("");
-
-        setPanoramaStreetView(mMap.getCameraPosition().target.latitude,
-                mMap.getCameraPosition().target.longitude);
+        setPanoramaStreetView(latitude, longitude);
 
         return address;
     }
@@ -402,7 +383,6 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
          */
-
         try {
             if (mLocationPermissionGranted) {
                 Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
@@ -410,34 +390,24 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful()) {
-                            // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(mLastKnownLocation.getLatitude(),
-                                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-
                             LatLng spotOnMap = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-                            mMap.addMarker(new MarkerOptions().position(spotOnMap).title("Marker in" + mLastKnownLocation));
-                            setPanoramaStreetView(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-
                             try {
-                                positionToAddress(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+                                addNewMarker(spotOnMap, positionToAddress(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
-                            mMap.addMarker(new MarkerOptions().position(mDefaultLocation).title("Marker in" + mDefaultLocation));
-                            mMap.getUiSettings().setMyLocationButtonEnabled(false);
-                            setPanoramaStreetView(mDefaultLocation.latitude, mDefaultLocation.longitude);
+
                             try {
-                                positionToAddress(mDefaultLocation.latitude, mDefaultLocation.longitude);
+                                addNewMarker(mDefaultLocation, positionToAddress(mDefaultLocation.latitude,mDefaultLocation.longitude) );
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
+
+                            mMap.getUiSettings().setMyLocationButtonEnabled(false);
                         }
                     }
                 });
@@ -446,4 +416,13 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
             Log.e("Exception: %s", e.getMessage());
         }
     }
+
+    public void addNewMarker(LatLng spotOnMap, String markerTitle){
+        mMap.clear();
+        mMap.addMarker(new MarkerOptions().position(spotOnMap).title(markerTitle));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(spotOnMap,DEFAULT_ZOOM));
+        mMap.animateCamera(CameraUpdateFactory.zoomIn());
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+    }
+
 }
