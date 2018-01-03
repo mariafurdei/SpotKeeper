@@ -42,6 +42,7 @@ import com.google.android.gms.maps.OnStreetViewPanoramaReadyCallback;
 import com.google.android.gms.maps.StreetViewPanorama;
 import com.google.android.gms.maps.SupportStreetViewPanoramaFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -182,7 +183,10 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void afterTextChanged(Editable s) {
                 if (!addressView.getText().toString().matches("")) {
-                    addressToPosition(addressView.getText().toString());}
+                    LatLng address = addressToPosition(addressView.getText().toString());
+                    addNewMarker(address, addressView.getText().toString());
+                    setPanoramaStreetView(address.latitude, address.longitude);
+                }
             }
         });
 
@@ -263,7 +267,6 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
 
@@ -276,7 +279,10 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
 
             updateLocationUI();
 
-            addressToPosition(spotAddress);
+            //addressToPosition(spotAddress);
+            LatLng address = addressToPosition(spotAddress);
+            addNewMarker(address, spotAddress);
+            setPanoramaStreetView(address.latitude, address.longitude);
         } else {
 
             // Turn on the My Location layer and the related control on the map.
@@ -289,8 +295,12 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
+                String address = null;
                 try {
-                    addNewMarker(latLng, positionToAddress(latLng.latitude, latLng.longitude));
+                    address = positionToAddress(latLng.latitude, latLng.longitude);
+                    addNewMarker(latLng, address);
+                    setNewAddress(address, latLng.latitude, latLng.longitude);
+                    setPanoramaStreetView(latLng.latitude, latLng.longitude);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -306,7 +316,7 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
-    private void addressToPosition(String spotAddress){
+    private LatLng addressToPosition(String spotAddress){
         Geocoder geocoder = new Geocoder(getActivity());
         List<Address> addresses = null;
         try {
@@ -314,14 +324,15 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        LatLng spotOnMap = null;
         if (addresses.size() > 0) {
             final double latitude = addresses.get(0).getLatitude();
             final double longitude = addresses.get(0).getLongitude();
 
-            LatLng spotOnMap = new LatLng(latitude, longitude);
-            addNewMarker(spotOnMap, spotAddress);
-            setPanoramaStreetView(latitude, longitude);
+            spotOnMap = new LatLng(latitude, longitude);
         }
+
+        return spotOnMap;
     }
 
     private String positionToAddress(double latitude, double longitude) throws IOException {
@@ -330,14 +341,17 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
         String address = (addresses != null && addresses.size() > 0)
                 ? addresses.get(0).getAddressLine(0)
                 : "Unknown";
+
+        return address;
+    }
+
+    private void setNewAddress(String address, double latitude, double longitude){
         View rootView = getView();
         TextView addressView = (TextView) rootView.findViewById(R.id.spot_address_detail);
         TextView nameView = (TextView) rootView.findViewById(R.id.spot_name_detail);
         addressView.setText(address);
         nameView.setText("");
         setPanoramaStreetView(latitude, longitude);
-
-        return address;
     }
 
     private void setPanoramaStreetView(final double latitude, final double longitude) {
@@ -393,7 +407,10 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
                             mLastKnownLocation = task.getResult();
                             LatLng spotOnMap = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
                             try {
-                                addNewMarker(spotOnMap, positionToAddress(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+                                //addNewMarker(spotOnMap, positionToAddress(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+                                String address = positionToAddress(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+                                addNewMarker(spotOnMap, address);
+                                setNewAddress(address, mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -402,7 +419,10 @@ public class SpotDetailFragment extends Fragment implements OnMapReadyCallback {
                             Log.e(TAG, "Exception: %s", task.getException());
 
                             try {
-                                addNewMarker(mDefaultLocation, positionToAddress(mDefaultLocation.latitude,mDefaultLocation.longitude) );
+                                //addNewMarker(mDefaultLocation, positionToAddress(mDefaultLocation.latitude,mDefaultLocation.longitude) );
+                                String address = positionToAddress(mDefaultLocation.latitude,mDefaultLocation.longitude);
+                                addNewMarker(mDefaultLocation, address);
+                                setNewAddress(address, mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
